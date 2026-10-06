@@ -7,16 +7,16 @@ prop_router.get('', async (req, res) => {
 
         // Find filters from the request.
         const { conditionsQuery, params } = buildQuery(req.query);
+        
+        // Handle invalid limit requests.
+        if (parseInt(req.query.limit) === 0 || parseInt(req.query.limit) >= 200) {
+            throw new Error('Invalid limit.');
+        }
 
         // Get limit and offset values from the request.
         // Default limit value is 20. Default offset value is 0.
         const limit = parseInt(req.query.limit) || 20;
         const offset = parseInt(req.query.offset) || 0;
-
-        // Handle invalid limit requests.
-        if (limit === 0 || limit >= 200) {
-            throw new Error('Invalid limit.');
-        }
 
         // Query statement with filters for total number of results.
         const countQuery = `SELECT COUNT(*) as total FROM rets.rets_property ${conditionsQuery}`;
