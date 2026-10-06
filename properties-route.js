@@ -5,13 +5,18 @@ const prop_router = express.Router();
 prop_router.get('', async (req, res) => {
     try {
 
-        // Find filters from the request.
-        const { conditionsQuery, params } = buildQuery(req.query);
-        
         // Handle invalid limit requests.
-        if (parseInt(req.query.limit) === 0 || parseInt(req.query.limit) >= 200) {
+        if (parseInt(req.query.limit) <= 0 || parseInt(req.query.limit) >= 200) {
             throw new Error('Invalid limit.');
         }
+
+        // Handle invalid offset requests.
+        if (parseInt(req.query.offset) < 0) {
+            throw new Error('Invalid offset.');
+        }
+        
+        // Get filters from the request.
+        const { conditionsQuery, params } = buildQuery(req.query);
 
         // Get limit and offset values from the request.
         // Default limit value is 20. Default offset value is 0.
@@ -59,54 +64,64 @@ function buildQuery(filters) {
         params.push(filters.city.trim().toLowerCase());
     }
 
-    // Zip code filter (must be an integer).
+    // Zip code filter (must be a positive integer).
     if (filters.zip) {
-        if (isNaN(parseInt(filters.zip))) {
+        const zip = parseInt(filters.zip);
+
+        if (isNaN(zip) || zip < 0) {
             throw new Error('Invalid zip code.');
         }
 
         conditions.push('L_Zip = ?');
-        params.push(parseInt(filters.zip));
+        params.push(zip);
     }
 
-    // Minimumm price filter (must be an integer).
+    // Minimumm price filter (must be a positive integer).
     if (filters.minPrice) {
-        if (isNaN(parseInt(filters.minPrice))) {
+        const minPrice = parseInt(filters.minPrice);
+
+        if (isNaN(minPrice) || minPrice < 0) {
             throw new Error('Invalid min price.');
         }
 
         conditions.push('L_SystemPrice >= ?');
-        params.push(parseInt(filters.minPrice));
+        params.push(minPrice);
     }
 
-    // Maximum price filter (must be an integer).
+    // Maximum price filter (must be a positive integer).
     if (filters.maxPrice) {
-        if (isNaN(parseInt(filters.maxPrice))) {
+        const maxPrice = parseInt(filters.maxPrice);
+
+        if (isNaN(maxPrice) || maxPrice < 0) {
             throw new Error('Invalid max price.');
         }
         
         conditions.push('L_SystemPrice <= ?');
-        params.push(parseInt(filters.maxPrice));
+        params.push(maxPrice);
     }
 
-    // Number of beds filter (must be an integer).
+    // Number of beds filter (must be a positive integer).
     if (filters.beds) {
-        if (isNaN(parseInt(filters.beds))) {
+        const beds = parseInt(filters.beds);
+
+        if (isNaN(beds) || beds < 0) {
             throw new Error('Invalid bed count.');
         }
 
         conditions.push('L_Keyword2 = ?');
-        params.push(parseInt(filters.beds));
+        params.push(beds);
     }
 
-    // Number of baths (must be an integer).
+    // Number of baths (must be a positive integer).
     if (filters.baths) {
-        if (isNaN(parseInt(filters.baths))) {
+        const baths = parseInt(filters.baths);
+
+        if (isNaN(baths) || baths < 0) {
             throw new Error('Invalid bath count'); 
         }
 
         conditions.push('LM_Dec_3 = ?')
-        params.push(parseInt(filters.baths));
+        params.push(baths);
     }
 
     // Connect conditions to form a query.
