@@ -18,10 +18,10 @@ prop_router.get('', async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const offset = parseInt(req.query.offset) || 0;
 
-        // Query statement with filters for total number of results.
+        // Query statement with conditions for total number of results.
         const countQuery = `SELECT COUNT(*) as total FROM rets.rets_property ${conditionsQuery}`;
 
-        // Query statement with filters for data results.
+        // Query statement with conditions for data results.
         const dataQuery = `SELECT * FROM rets.rets_property ${conditionsQuery} LIMIT ? OFFSET ?`;
 
         // Execute queries with parameters.
@@ -110,7 +110,7 @@ function buildQuery(filters) {
     }
 
     // Connect conditions to form a query.
-    const conditionsQuery = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
+    const conditionsQuery = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     return { conditionsQuery, params };
 }
