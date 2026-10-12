@@ -2,7 +2,6 @@ const pool = require('./conn_pool');
 const express = require('express');
 const cors = require('cors');
 const properties = require('./properties-route')
-
 const app = express();
 
 // Cross-origin connection.
@@ -40,6 +39,7 @@ app.get('/api/health', async (req, res) => {
 app.listen(process.env.BACKEND_PORT, () => {
     console.log(`App is running on port ${process.env.BACKEND_PORT}`);
 })
+
 
 // Add properties route file.
 app.use('/api/properties', properties);
