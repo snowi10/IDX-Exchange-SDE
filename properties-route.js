@@ -6,6 +6,8 @@ const prop_router = express.Router();
 const logger = (req, res, next) => {
 
     res.on('finish', () => {
+
+        // Log method, url, status code, and duration of each request.
         const method = req.method;
         const url = req.originalUrl;
         const status = res.statusCode === 304 ? 200 : res.statusCode;
