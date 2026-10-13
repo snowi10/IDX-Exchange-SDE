@@ -2,7 +2,12 @@ const express = require('express');
 const pool = require('./conn_pool');
 const prop_router = express.Router();
 
-// Middleware logger.
+/**
+ * Middleware logger.
+ * @param {req} req - The http request.  
+ * @param {res} res - The response from the http request.
+ * @param {next} next - The next route for the middleware logger.
+ */
 const logger = (req, res, next) => {
 
     res.on('finish', () => {
@@ -21,9 +26,7 @@ const logger = (req, res, next) => {
 
 prop_router.use(logger);
 
-/**
- * Return JSON of paginated list of properties with optional filters.
- */
+// Return JSON of paginated list of properties with optional filters.
 prop_router.get('', async (req, res) => {
     try {
 
@@ -78,15 +81,13 @@ prop_router.get('', async (req, res) => {
     }
 }); 
 
-/**
- * Return JSON of open house information of a property from the ID.
- */
+// Return JSON of open house information of a property from the ID.
 prop_router.get('/:id/openhouse', async (req, res) => {
     try {
         const id = req.params.id;
 
-        // Handle an invalid ID (must contain all digits and be equal to or shorter than length 11).  
-        if (/^\d+$/.test(id) === false || id.length > 11) {
+        // Handle an invalid ID.  
+        if (!isValidId(id)) {
             throw new Error('Invalid ID.');
         }
     
@@ -124,16 +125,14 @@ prop_router.get('/:id/openhouse', async (req, res) => {
     }
 })
 
-/**
- * Return JSON of the property from the ID.
- */
+// Return JSON of the property from the ID.
 prop_router.get('/:id', async (req, res) => {
     try {
 
         const id = req.params.id;
 
-        // Handle an invalid ID (must contain all digits and be equal to or shorter than length 11).  
-        if (/^\d+$/.test(id) === false || id.length > 11) {
+        // Handle an invalid ID.  
+        if (!isValidId(id)) {
             throw new Error('Invalid ID.');
         }
 
@@ -163,7 +162,26 @@ prop_router.get('/:id', async (req, res) => {
     }
 });
 
-// Find a property in the datbase.
+/**
+ * Check for a valid ID. 
+ * @param {number} id - The requested ID.
+ * @returns true for a valid ID or false for an invalid ID. 
+ */
+function isValidId(id) {
+
+        // ID must contain all digits and be equal to or shorter than length 11.  
+        if (/^\d+$/.test(id) === false || id.length > 11) {
+            return false;
+        }
+
+        return true;
+}
+
+/**
+ * Find a property in the database. 
+ * @param {number} id - The ID of the property.
+ * @returns an object consisting of the property information.
+ */
 async function findProperty(id) {
 
     // Query the property with the ID. 
@@ -174,7 +192,11 @@ async function findProperty(id) {
     return property;
 }
 
-// Build query from filters. 
+/**
+ * Build query from filters.
+ * @param {req.query} filters - The requested query with filtering information. 
+ * @returns an object with the query and parameters for filtering.
+ */
 function buildQuery(filters) {
     let conditions = []; // Conditions for the query.
     let params = []; // Parameters for the conditions.
