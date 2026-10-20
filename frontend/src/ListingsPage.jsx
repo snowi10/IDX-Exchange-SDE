@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { fetchProperties } from './api/client';
 import styles from './ListingsPage.module.css';
+import photo_unavailable from './assets/photo_unavailable.jpg'
 
 export default function ListingsPage() {
 
     const [properties, setProperties] = useState([])
     const [totalProperties, setTotalProperties] = useState(0);
+    const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null); 
 
     useEffect(() => {
@@ -57,30 +59,47 @@ export default function ListingsPage() {
             catch (error) {
                 setErrorMessage(error.message);
             }
+            finally {
+                setLoading(false);
+            }
         }
 
         callFetchProperties();
+
+        // setTimeout to verify loading screen. 
+        // setTimeout(callFetchProperties, 1000);
     }, []);
 
+    // TODO: Create better UI for error message.
     if (errorMessage) {
         return <div>{errorMessage}</div>
+    }
+
+    // TODO: Create better UI for loading screen.
+    if (loading) {
+        return <div>Loading...</div>
     }
 
     // TODO: reformat
     return (
     <>
-        <div>{properties}</div>
+        <div class={styles.grid}>{properties}</div>
         <div>Showing {properties.length} out of {totalProperties} properties</div>
     </>)    
 }
 
 function PropertyCard({ photo, price, address, city, state, beds, baths, sqft }) {
+    photo = photo === '' ? photo_unavailable : photo; 
+
     // TODO: Add zipcode.
     // TODO: Reformat cards and descriptions.
+    // TODO: Create function for handling loading images.
     return (
     <div class={styles.card}>
-        <div class={styles.container}>
+        <div class={styles.image_container}>
             <img src={photo}></img>
+        </div>
+        <div class={styles.description_container}>
             <p>${price}</p>
             <p>{address}, {city}, {state}</p>
             <p>Beds: {beds}</p>
