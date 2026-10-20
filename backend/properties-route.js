@@ -237,7 +237,7 @@ function buildQuery(filters) {
         const zip = parseInt(filters.zip);
 
         if (isNaN(zip) || zip < 0) {
-            throw new Error('Invalid zip code.');
+            throw new Error('Invalid zip code');
         }
 
         conditions.push('L_Zip = ?');
@@ -249,7 +249,7 @@ function buildQuery(filters) {
         const minPrice = parseInt(filters.minPrice);
 
         if (isNaN(minPrice) || minPrice < 0) {
-            throw new Error('Invalid min price.');
+            throw new Error('Invalid min price');
         }
 
         conditions.push('L_SystemPrice >= ?');
@@ -261,7 +261,7 @@ function buildQuery(filters) {
         const maxPrice = parseInt(filters.maxPrice);
 
         if (isNaN(maxPrice) || maxPrice < 0) {
-            throw new Error('Invalid max price.');
+            throw new Error('Invalid max price');
         }
         
         conditions.push('L_SystemPrice <= ?');
@@ -273,7 +273,7 @@ function buildQuery(filters) {
         const beds = parseInt(filters.beds);
 
         if (isNaN(beds) || beds < 0) {
-            throw new Error('Invalid bed count.');
+            throw new Error('Invalid bed count');
         }
 
         conditions.push('L_Keyword2 = ?');
