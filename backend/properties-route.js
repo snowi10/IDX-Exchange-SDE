@@ -36,48 +36,67 @@ prop_router.get('', async (req, res) => {
 
         // Handle invalid limit requests.
         if (limit <= 0 || limit >= 200) {
-            throw new Error('Invalid limit.');
+            return (res.status(400).json({
+                status: '400: Bad request',
+                error: 'Invalid limit'
+            }));
         }
 
         // Handle invalid offset requests.
         if (offset < 0) {
-            throw new Error('Invalid offset.');
+            return (res.status(400).json({
+                status: '400: Bad request',
+                error: 'Invalid offset'
+            }));
+        }
+
+        // Get filters from the request.
+        let queryConditions = '';
+        let queryParams = []; 
+        try{
+            const { conditionsString, params } = buildQuery(req.query);
+            queryConditions = conditionsString;
+            queryParams = params;
+        }
+        catch (error) {
+            // Return status '400' for invalid filters.
+            return (res.status(400).json({
+                status: '400: Bad request',
+                error: error.message
+            }))
         }
         
-        // Get filters from the request.
-        const { conditionsQuery, params } = buildQuery(req.query);
-
         // Default limit value is 20. Default offset value is 0.
         limit = limit || 20;
         offset = offset || 0;
 
         // Query statement with conditions for total number of results.
-        const countQuery = `SELECT COUNT(*) AS total FROM rets.rets_property ${conditionsQuery}`;
+        const countQuery = `SELECT COUNT(*) AS total FROM rets.rets_property ${queryConditions}`;
 
         // Query statement with conditions for data results.
-        const dataQuery = `SELECT * FROM rets.rets_property ${conditionsQuery} LIMIT ? OFFSET ?`;
+        const dataQuery = `SELECT * FROM rets.rets_property ${queryConditions} LIMIT ? OFFSET ?`;
 
         // Execute queries with parameters.
-        const [count] = await pool.query(countQuery, [...params]);
-        const [rows] = await pool.query(dataQuery, [...params, parseInt(limit), parseInt(offset)]);
+        const [count] = await pool.query(countQuery, [...queryParams]);
+        const [rows] = await pool.query(dataQuery, [...queryParams, parseInt(limit), parseInt(offset)]);
 
         // Get total number of results.
         const total = count[0].total;
 
         // Return status '200' for successful queries.
-        res.status(200).json({
+        return (res.status(200).json({
             total,
-            "limit": limit,
-            "offset": offset,
-            "results": rows});
+            limit: limit,
+            offset: offset,
+            results: rows}));
     }
 
-    // Return status '400' for unsuccessful queries.
+    // Return status '500' for unsuccessful queries.
     catch (error) {
-        res.status(400).json({
-            status: '400: Bad request.',
-            error: error.message
-        });
+        return (res.status(500).json({
+            status: '500: Internal server error',
+            error: !error.message ? 'Unsuccessful query' : error.message 
+        }));
     }
 }); 
 
@@ -88,7 +107,10 @@ prop_router.get('/:id/openhouse', async (req, res) => {
 
         // Handle an invalid ID.  
         if (!isValidId(id)) {
-            throw new Error('Invalid ID.');
+            return (res.status(400).json({
+                status: '400: Bad request',
+                error: 'Invalid ID'
+            }))
         }
     
         // Find the property from the ID.
@@ -106,22 +128,22 @@ prop_router.get('/:id/openhouse', async (req, res) => {
             let openhouseInfo = (openhouseData.map((info) => JSON.parse(info['all_data'])));
 
             // Return status '200' with open house data.
-            res.status(200).json(openhouseInfo);
+            return (res.status(200).json(openhouseInfo));
         }
         else {
             // Return status '404' with no property found.
-            res.status(404).json({
-                status: '404: Not found.',
-                error: 'Unknown ID.'
-            });
+            return (res.status(404).json({
+                status: '404: Not found',
+                error: 'Unknown ID'
+            }));
         }
     }
     catch (error) {
-        // Return status '400' for unsuccessful queries.
-        res.status(400).json({
-            status: '400: Bad request.',
-            error: error.message
-        });
+        // Return status '500' for unsuccessful queries.
+        return (res.status(500).json({
+            status: '500: Internal server error',
+            error: !error.message ? 'Unsuccessful query' : error.message
+        }));
     }
 })
 
@@ -133,7 +155,10 @@ prop_router.get('/:id', async (req, res) => {
 
         // Handle an invalid ID.  
         if (!isValidId(id)) {
-            throw new Error('Invalid ID.');
+            return (res.status(400).json({
+                status: '400: Bad request',
+                error: 'Invalid ID'
+            })) 
         }
 
         // Find the property from the ID.
@@ -141,24 +166,24 @@ prop_router.get('/:id', async (req, res) => {
 
         if (property) {
             // Return status '200' with the property data.
-            res.status(200).json(property);
+            return (res.status(200).json(property));
         }
 
         else {
             // Return status '404' with no property found.
-            res.status(404).json({
-                status: '404: Not found.',
-                error: 'Unknown ID.'
+            return (res.status(404).json({
+                status: '404: Not found',
+                error: 'Unknown ID'
 
-            });
+            }));
         }
     }
-    // Return status '400' for unsuccessful queries.
+    // Return status '500' for unsuccessful queries.
     catch (error) {
-        res.status(400).json({
-            status: '400: Bad request.',
-            error: error.message
-        });
+        return (res.status(500).json({
+            status: '500: Internal server error',
+            error: !error.message ? 'Unsuccessful query' : error.message 
+        }));
     }
 });
 
@@ -268,9 +293,9 @@ function buildQuery(filters) {
     }
 
     // Connect conditions to form a query.
-    const conditionsQuery = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const conditionsString = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    return { conditionsQuery, params };
+    return { conditionsString, params };
 }
    
 module.exports = prop_router;
