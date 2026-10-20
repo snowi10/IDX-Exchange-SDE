@@ -89,7 +89,7 @@ export default function ListingsPage() {
 }
 
 function PropertyCard({ photo, price, address, city, state, beds, baths, sqft }) {
-    photo = photo === '' ? photo_unavailable : photo; 
+    photo = photo === 'Photo Unavailable' ? photo_unavailable : photo;
 
     // TODO: Add zipcode.
     // TODO: Reformat cards and descriptions.
