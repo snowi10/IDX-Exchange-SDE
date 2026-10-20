@@ -4,6 +4,6 @@ export async function fetchProperties(params) {
 }
 
 export async function fetchPropertyDetail(id) {
-    const property = await fetch(`/api/properties/:${id}`);
+    const property = await fetch(`/api/properties/${id}`);
     return property;
 }
