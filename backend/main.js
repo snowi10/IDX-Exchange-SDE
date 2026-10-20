@@ -6,7 +6,7 @@ const app = express();
 
 // Cross-origin connection.
 const corsOptions = {
-    origin: 'https://localhost:3306',
+    origin: `${process.env.CROSS_ORIGIN}`,
     methods: 'GET'
 };
 
@@ -20,18 +20,18 @@ app.get('/api/health', async (req, res) => {
         await pool.query('SELECT 1');
         
         // Return status '200' for connected database.
-        res.status(200).json({
+        return (res.status(200).json({
             status: '200: Ok.',
             database: 'Connected.' 
-        });
+        }));
     }
     catch(error) {
 
         // Return status '500' for no connection.
-        res.status(500).json({
+        return (res.status(500).json({
             status: '500: Not connected.',
             error: error.message
-        });
+        }));
     }
 });
 
