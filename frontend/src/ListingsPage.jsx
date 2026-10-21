@@ -15,8 +15,11 @@ export default function ListingsPage() {
         const callFetchProperties = async () => {
 
             try {
+
+                // API call to backend to fetch properties.
                 const response = await fetchProperties()
 
+                // Handle errors from JSON response.
                 if (response.status !== 200) {
                     const json = await response.json();
                     setErrorMessage(`${json.status}, 
@@ -27,6 +30,7 @@ export default function ListingsPage() {
                     const json = await response.json();
                     let updatedProperties = [];
 
+                    // Create PropertyCard components for each property.
                     for (let i = 0; i < json.results.length; i++) {
 
                         const result = json.results[i];
@@ -71,11 +75,13 @@ export default function ListingsPage() {
     }, []);
 
     // TODO: Create better UI for error message.
+    // Display error messages.
     if (errorMessage) {
         return <div>{errorMessage}</div>
     }
 
     // TODO: Create better UI for loading screen.
+    // Display loading screen. 
     if (loading) {
         return <div>Loading...</div>
     }
@@ -89,6 +95,8 @@ export default function ListingsPage() {
 }
 
 function PropertyCard({ photo, price, address, city, state, beds, baths, sqft }) {
+
+    // Replace image of properties with no photo URLs.
     photo = photo === 'Photo Unavailable' ? photo_unavailable : photo;
 
     // TODO: Add zipcode.
@@ -97,7 +105,7 @@ function PropertyCard({ photo, price, address, city, state, beds, baths, sqft })
     return (
     <div class={styles.card}>
         <div class={styles.image_container}>
-            <img src={photo}></img>
+            <img src={photo} loading="lazy"></img>
         </div>
         <div class={styles.description_container}>
             <p>${price}</p>
