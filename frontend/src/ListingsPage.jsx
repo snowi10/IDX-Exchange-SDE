@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { fetchProperties } from './api/client';
 import styles from './ListingsPage.module.css';
-import photo_unavailable from './assets/photo_unavailable.jpg'
+import photo_unavailable from './assets/photo_unavailable.jpg';
+import loading_photo from './assets/loading_photo.jpg';
 
 export default function ListingsPage() {
 
@@ -63,15 +64,13 @@ export default function ListingsPage() {
             catch (error) {
                 setErrorMessage(error.message);
             }
-            finally {
-                setLoading(false);
-            }
         }
 
         callFetchProperties();
+        setLoading(false);
 
         // setTimeout to verify loading screen. 
-        // setTimeout(callFetchProperties, 1000);
+        //setTimeout(callFetchProperties, 1000);
     }, []);
 
     // TODO: Create better UI for error message.
@@ -95,17 +94,24 @@ export default function ListingsPage() {
 }
 
 function PropertyCard({ photo, price, address, city, state, beds, baths, sqft }) {
+    const [photoIsLoading, setPhotoIsLoading] = useState(true);
 
-    // Replace image of properties with no photo URLs.
+    // Replace photo of properties with no photo URLs.
     photo = photo === 'Photo Unavailable' ? photo_unavailable : photo;
+
+    // Set placeholder cards for photos that are still loading.
+    const actual = photoIsLoading ? {display: "none"} : {display : "block"};
+    const placeholder = photoIsLoading ? {display: "block"} : {display: "none"};
 
     // TODO: Add zipcode.
     // TODO: Reformat cards and descriptions.
-    // TODO: Create function for handling loading images.
     return (
-    <div class={styles.card}>
-        <div class={styles.image_container}>
-            <img src={photo} loading="lazy"></img>
+    <div class={styles.card} >
+        <div class={styles.image_container} style={actual}>
+            <img src={photo} onLoad={() => setPhotoIsLoading(false)}></img>
+        </div>   
+        <div class={styles.image_container} style={placeholder}>
+            <img src={loading_photo}></img>
         </div>
         <div class={styles.description_container}>
             <p>${price}</p>
