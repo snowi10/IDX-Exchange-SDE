@@ -88,10 +88,10 @@ export default function ListingsPage() {
         return <div>Loading...</div>
     }
 
-    // TODO: reformat
     return (
     <>
-        <div>Showing {properties.length} out of {totalProperties} properties</div>
+        <PropertyFilter />
+        <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
         <div class={styles.grid}>{properties}</div>
     </>)    
 }
@@ -109,18 +109,47 @@ function PropertyCard({ photo, price, address, city, state, beds, baths, sqft })
     // TODO: Add zipcode.
     // TODO: Choose font for card descriptions.
     return (
-    <div class={styles.card} >
-        <div class={styles.image_container} style={actual}>
-            <img src={photo} onLoad={() => setPhotoIsLoading(false)}></img>
-        </div>   
-        <div class={styles.image_container} style={placeholder}>
-            <img src={loading_photo}></img>
+        <div class={styles.card} >
+            <div class={styles.image_container} style={actual}>
+                <img src={photo} onLoad={() => setPhotoIsLoading(false)}></img>
+            </div>   
+            <div class={styles.image_container} style={placeholder}>
+                <img src={loading_photo}></img>
+            </div>
+            <div class={styles.description_container}>
+                <p id={styles.price}>${price}</p>
+                <p><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Square Feet</b>: {sqft}</p>
+                <p id={styles.address}>{address}, {city}, {state}</p>
+            </div>
         </div>
-        <div class={styles.description_container}>
-            <p id={styles.price}>${price}</p>
-            <p><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Square Feet</b>: {sqft}</p>
-            <p id={styles.address}>{address}, {city}, {state}</p>
+    )
+}
+
+function PropertyFilter() {
+    // TODO: Filter for city, zip code, min price, max price, beds (dropdown), baths (dropdown).
+
+    return (
+        <div class={styles.filter}>
+            <form>
+            <label for={styles.city_input}>City</label>
+            <input id={styles.city_input} type="text"></input>            
+                                                                         
+            <label for={styles.zip_input}>Zip</label>                   
+            <input id={styles.zip_input} type="text"></input>
+                                                                         
+            <label for={styles.min_price}>Min Price</label>                   
+            <input id={styles.min_price} type="text"></input>
             
+            <label for={styles.max_price}>Max Price</label>                   
+            <input id={styles.max_price} type="text"></input>
+
+            <label for={styles.beds}>Beds</label>                   
+            <select id={styles.beds}></select>
+
+            <label for={styles.baths}>Baths</label>                   
+            <select id={styles.baths}></select>
+
+            </form>
         </div>
-   </div>)
+    )
 }

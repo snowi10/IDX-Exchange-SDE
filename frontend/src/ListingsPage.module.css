@@ -8,11 +8,27 @@ body {
     font-family: 'CharisSIL';
 }
 
+#showing {
+    text-align: right;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     grid-template-rows: repeat(auto-fill, minmax(80px, 1fr));
     grid-auto-rows: 1fr;
+}
+
+.filter {
+    width: 100%;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    align-content: center;
+}
+
+.filter form {
+    padding: 20px;
 }
 
 .card {
