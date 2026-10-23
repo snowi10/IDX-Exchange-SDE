@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import { fetchProperties } from './api/client';
 import styles from './ListingsPage.module.css';
 import photo_unavailable from './assets/photo_unavailable.jpg';
@@ -18,7 +18,7 @@ export default function ListingsPage() {
             try {
 
                 // API call to backend to fetch properties.
-                const response = await fetchProperties()
+                const response = await fetchProperties();
 
                 // Handle errors from JSON response.
                 if (response.status !== 200) {
@@ -64,13 +64,16 @@ export default function ListingsPage() {
             catch (error) {
                 setErrorMessage(error.message);
             }
+            finally {
+                setLoading(false); // Set loading state to false after fetch has completed.
+            }
         }
-
-        callFetchProperties();
-        setLoading(false);
 
         // setTimeout to verify loading screen. 
         //setTimeout(callFetchProperties, 1000);
+
+        callFetchProperties(); // Fetch properties.
+
     }, []);
 
     // TODO: Create better UI for error message.
@@ -88,15 +91,15 @@ export default function ListingsPage() {
     // TODO: reformat
     return (
     <>
-        <div class={styles.grid}>{properties}</div>
         <div>Showing {properties.length} out of {totalProperties} properties</div>
+        <div class={styles.grid}>{properties}</div>
     </>)    
 }
 
 function PropertyCard({ photo, price, address, city, state, beds, baths, sqft }) {
     const [photoIsLoading, setPhotoIsLoading] = useState(true);
 
-    // Replace photo of properties with no photo URLs.
+    // Replace properties with no photos.
     photo = photo === 'Photo Unavailable' ? photo_unavailable : photo;
 
     // Set placeholder cards for photos that are still loading.
@@ -104,7 +107,7 @@ function PropertyCard({ photo, price, address, city, state, beds, baths, sqft })
     const placeholder = photoIsLoading ? {display: "block"} : {display: "none"};
 
     // TODO: Add zipcode.
-    // TODO: Reformat cards and descriptions.
+    // TODO: Choose font for card descriptions.
     return (
     <div class={styles.card} >
         <div class={styles.image_container} style={actual}>
@@ -114,11 +117,10 @@ function PropertyCard({ photo, price, address, city, state, beds, baths, sqft })
             <img src={loading_photo}></img>
         </div>
         <div class={styles.description_container}>
-            <p>${price}</p>
-            <p>{address}, {city}, {state}</p>
-            <p>Beds: {beds}</p>
-            <p>Baths: {baths}</p>
-            <p>Square Feet: {sqft}</p>
+            <p id={styles.price}>${price}</p>
+            <p><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Square Feet</b>: {sqft}</p>
+            <p id={styles.address}>{address}, {city}, {state}</p>
+            
         </div>
    </div>)
 }

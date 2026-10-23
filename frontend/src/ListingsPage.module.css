@@ -1,12 +1,20 @@
-body {
-    background-color:rgb(250, 241, 229)
+@font-face {
+    font-family: 'CharisSIL';
+    src: url('./assets/CharisSIL-Regular.ttf');
 }
+
+body {
+    background-color:rgb(250, 241, 229);
+    font-family: 'CharisSIL';
+}
+
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     grid-template-rows: repeat(auto-fill, minmax(80px, 1fr));
     grid-auto-rows: 1fr;
 }
+
 .card {
     margin: 5%; 
     background-color:white;
@@ -23,7 +31,7 @@ body {
 
 .image_container {
     display: block;
-    height: 50%;
+    height: 200px;
     overflow: hidden;
     object-fit: contain;
 }
@@ -39,11 +47,22 @@ body {
 .description_container {
     display: block;
     position: relative;
-    top: 2%;
+    bottom: 2%;
     padding: 2px 16px;
     object-fit: fill;
     justify-content: center;
     align-items: center;
     font-size: 1em;
+    line-height: 1;
     /*border: black solid 5px;*/
+}
+
+#price {
+    font-size: 150%;
+    font-weight: bold;
+}
+
+#address {
+    font-size: 120%;
+    font-weight: bold;
 }
