@@ -12,26 +12,13 @@ body {
     text-align: right;
 }
 
-.grid {
+.property_grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    grid-template-rows: repeat(auto-fill, minmax(80px, 1fr));
-    grid-auto-rows: 1fr;
+    grid-template-rows: repeat(auto-fill, minmax(40px, 1fr));
 }
 
-.filter {
-    width: 100%;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    align-content: center;
-}
-
-.filter form {
-    padding: 20px;
-}
-
-.card {
+.property_card {
     margin: 5%; 
     background-color:white;
     border-radius: 15px;
@@ -40,7 +27,7 @@ body {
     overflow: hidden;
 }
 
-.card:hover {
+.property_card:hover {
     box-shadow: 0 10px 15px 10px rgba(0,0,0,0.2);
     cursor: pointer;
 }
@@ -70,7 +57,7 @@ body {
     align-items: center;
     font-size: 1em;
     line-height: 1;
-    /*border: black solid 5px;*/
+    overflow: hidden;
 }
 
 #price {
@@ -81,4 +68,59 @@ body {
 #address {
     font-size: 120%;
     font-weight: bold;
+}
+
+.filter_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-auto-rows: 1fr;
+ 
+}
+
+.filter_container {
+    width: 100%;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    align-content: center;
+    overflow: hidden;
+}
+
+.filter_container form {
+    padding: 20px;
+}
+
+.filter_container label {
+    padding: 10px;
+    font-size: 100%;
+    font-weight: bold;
+}
+
+.filter_input {
+    width: 85%; 
+    height: 30px;
+    padding-left: 10px;
+    background-color:rgb(250, 241, 229);
+    border: 1.5px solid  black ;
+    border-radius: 15px;
+}
+
+.bed_baths_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
+}
+
+.bed_baths_grid select {
+    width: 50%;
+}
+
+#filter_submit {
+    position: relative;
+    margin-top: 15px;
+    width: 100px;
+    color: black;
+    background-color: lightgray; /* TODO: Maybe change this color */
+    font-family: 'CharisSil';
+    font-size: 01em;
+    overflow:hidden;
 }
