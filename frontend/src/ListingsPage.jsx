@@ -5,118 +5,74 @@ import photo_unavailable from './assets/photo_unavailable.jpg';
 import loading_photo from './assets/loading_photo.jpg';
 
 /**
- * The main property listings page.
+ * The component for the main property listings page.
  */
 export default function ListingsPage() {
-
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null); 
-
     const [properties, setProperties] = useState([])
     const [totalProperties, setTotalProperties] = useState(0);
-
     const [submitted, setSubmitted] = useState(false);
-
     const [filters, setFilters] = useState({});
-    const [filtersHistory, setFiltersHistory] = useState({});
 
+    // Handle filters form submission in the PropertyFilter component.
     function handleOnSubmit(e) {
         e.preventDefault();
-        setFiltersHistory(filters);
         setSubmitted(true);
     }
     
+    // Handle changing filters in the PropertyFilter component.
     function handleFilterChange(e) {
         setSubmitted(false);
         setFilters({... filters, [e.target.name]: e.target.value});
     }
 
+    // Handle clearing filters in the PropertyFilter component.
     function handleClearFilters() {
         setSubmitted(false);
         setFilters({});
         setFiltersHistory({});
     }
 
+    // Fetch default properties when first loading the page.
     useEffect(() => {
-
-        const callFetchProperties = async () => {
+        const fetchDefaultProperties = async () => {
             try {
-                let response;
-                let filtersString;
-
-                console.log(filters);
-                console.log(filtersHistory);
-
-                // API call to backend to fetch properties.
-                if (submitted) {
-                    setLoading(true);
-
-                    // Fetch properties with new filters when requested by user.
-                    filtersString = filtersToString(filters);
-                    response = await fetchProperties(filtersString);
-                }
-                else {
-
-                    // Fetch properties with previous filters to keep properties' state.
-                    filtersString = filtersToString(filtersHistory);
-                    response = await fetchProperties(filtersString);
-                }
-
-                // Handle errors from JSON response.
-                if (response.status !== 200) {
-                    const json = await response.json();
-                    setErrorMessage(`${json.status}, 
-                        ${json.error}`);
-                }
-                else {
-
-                    const json = await response.json();
-                    let updatedProperties = [];
-
-                    // Create PropertyCard components for each property.
-                    for (let i = 0; i < json.results.length; i++) {
-
-                        const result = json.results[i];
-                        const photo = result.L_Photos ? JSON.parse(result.L_Photos)[0] : 'Photo Unavailable';
-                        const price = result.L_SystemPrice;
-                        const address = result.L_Address;
-                        const city = result.L_City;
-                        const zip = result.L_Zip;
-                        const state = result.L_State;
-                        const beds = result.L_Keyword2;
-                        const baths = parseInt(result.LM_Dec_3);
-                        const sqft = result.LM_Int2_3;
-
-                        updatedProperties.push(<PropertyCard 
-                            key={i} 
-                            photo={photo} 
-                            price={price} 
-                            address={address} 
-                            city={city}
-                            zip={zip} 
-                            state={state} 
-                            beds={beds} 
-                            baths={baths} 
-                            sqft={sqft}/>)
-                    }
-
-                    setProperties(updatedProperties);
-                    setTotalProperties(json.total);
-                }
-
+                let response = await fetchProperties();
+                await createPropertyCards(response, setErrorMessage, setProperties, setTotalProperties);
             }
             catch (error) {
                 setErrorMessage(error.message);
             }
             finally {
-                setLoading(false); // No longer loading after properties have been fetched.
+                setLoading(false);
             }
         }
 
-        // setTimeout to verify loading screen. 
-        //setTimeout(callFetchProperties, 1000);
+        fetchDefaultProperties();
 
-        callFetchProperties(); // Fetch properties.
+    }, []);
+
+    // Fetch filtered properties when users submit a request.
+    useEffect(() => {
+        const fetchFilteredProperties = async () => {
+            try {
+                if (submitted) {
+                    setLoading(true);
+                    let filtersString = filtersToString(filters);
+                    let response = await fetchProperties(filtersString);
+                    await createPropertyCards(response, setErrorMessage, setProperties, setTotalProperties);
+                }
+            }
+            catch (error) {
+                setErrorMessage(error.message);
+            }
+            finally {
+                setLoading(false); 
+            }
+        }
+
+        fetchFilteredProperties(); 
 
     }, [submitted]);
 
@@ -180,6 +136,7 @@ function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sq
     const actual = photoIsLoading ? {display: "none"} : {display : "block"};
     const placeholder = photoIsLoading ? {display: "block"} : {display: "none"};
 
+    // TODO: Handle empty strings in the description container.
     return (
         <div className={styles.property_card} >
             <div className={styles.image_container} style={actual}>
@@ -303,6 +260,56 @@ function PropertyFilter({ onSubmit, onFilterChange, onClearFilters, filters }) {
             </form>
         </div>
     )
+}
+
+/**
+ * Create PropertyCard components for each property in the JSON response.
+ * @param {json} response - The JSON response of the list of properties. 
+ * @param {function} setErrorMessage - Handle setting an error message.
+ * @param {function} setProperties - Handle setting the list of PropertyCard components.
+ * @param {function} setTotalProperties - Handle setting the total number of properties from the JSON response.
+ */
+async function createPropertyCards(response, setErrorMessage, setProperties, setTotalProperties) {
+                // Handle errors from JSON response.
+    if (response.status !== 200) {
+    const json = await response.json();
+    setErrorMessage(`${json.status}, 
+        ${json.error}`);
+    }
+    else {
+    const json = await response.json();
+    let updatedProperties = [];
+
+    // Create PropertyCard components for each property.
+    for (let i = 0; i < json.results.length; i++) {
+        const result = json.results[i];
+        const photo = result.L_Photos ? JSON.parse(result.L_Photos)[0] : 'Photo Unavailable';
+        const price = result.L_SystemPrice;
+        const address = result.L_Address;
+        const city = result.L_City;
+        const zip = result.L_Zip;
+        const state = result.L_State;
+        const beds = result.L_Keyword2;
+        const baths = parseInt(result.LM_Dec_3);
+        const sqft = result.LM_Int2_3;
+
+        updatedProperties.push(<PropertyCard 
+            key={i} 
+            photo={photo} 
+            price={price} 
+            address={address} 
+            city={city}
+            zip={zip} 
+            state={state} 
+            beds={beds} 
+            baths={baths} 
+            sqft={sqft}/>)
+    }
+
+    setProperties(updatedProperties);
+    setTotalProperties(json.total);
+    }
+
 }
 
 /**
