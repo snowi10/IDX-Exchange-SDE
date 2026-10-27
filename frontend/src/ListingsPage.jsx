@@ -1,24 +1,66 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useMemo} from 'react';
 import { fetchProperties } from './api/client';
 import styles from './ListingsPage.module.css';
 import photo_unavailable from './assets/photo_unavailable.jpg';
 import loading_photo from './assets/loading_photo.jpg';
 
+/**
+ * The main property listings page.
+ */
 export default function ListingsPage() {
+
+    const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null); 
 
     const [properties, setProperties] = useState([])
     const [totalProperties, setTotalProperties] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState(null); 
+
+    const [submitted, setSubmitted] = useState(false);
+
+    const [filters, setFilters] = useState({});
+    const [filtersHistory, setFiltersHistory] = useState({});
+
+    function handleOnSubmit(e) {
+        e.preventDefault();
+        setFiltersHistory(filters);
+        setSubmitted(true);
+    }
+    
+    function handleFilterChange(e) {
+        setSubmitted(false);
+        setFilters({... filters, [e.target.name]: e.target.value});
+    }
+
+    function handleClearFilters() {
+        setSubmitted(false);
+        setFilters({});
+        setFiltersHistory({});
+    }
 
     useEffect(() => {
 
         const callFetchProperties = async () => {
-
             try {
+                let response;
+                let filtersString;
+
+                console.log(filters);
+                console.log(filtersHistory);
 
                 // API call to backend to fetch properties.
-                const response = await fetchProperties('offset=40');
+                if (submitted) {
+                    setLoading(true);
+
+                    // Fetch properties with new filters when requested by user.
+                    filtersString = filtersToString(filters);
+                    response = await fetchProperties(filtersString);
+                }
+                else {
+
+                    // Fetch properties with previous filters to keep properties' state.
+                    filtersString = filtersToString(filtersHistory);
+                    response = await fetchProperties(filtersString);
+                }
 
                 // Handle errors from JSON response.
                 if (response.status !== 200) {
@@ -67,7 +109,7 @@ export default function ListingsPage() {
                 setErrorMessage(error.message);
             }
             finally {
-                setLoading(false); // Set loading state to false after fetch has completed.
+                setLoading(false); // No longer loading after properties have been fetched.
             }
         }
 
@@ -76,28 +118,58 @@ export default function ListingsPage() {
 
         callFetchProperties(); // Fetch properties.
 
-    }, []);
+    }, [submitted]);
 
     // TODO: Create better UI for error message.
-    // Display error messages.
+    // UI for error messages.
     if (errorMessage) {
         return <div>{errorMessage}</div>
     }
 
     // TODO: Create better UI for loading screen.
-    // Display loading screen. 
+    // UI for API call that is still loading. 
     if (loading) {
-        return <div>Loading...</div>
+        return (
+            <>
+                <PropertyFilter onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
+                <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
+                <div>Loading...</div>
+            </>
+        )
     }
 
+    // UI for no properties found.
+    if (totalProperties === 0) {
+        return (
+            <>
+                <PropertyFilter onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
+                <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
+                <div>No properties found.</div>
+            </>
+        )
+    }
+
+    // UI for properties list.
     return (
-    <>
-        <PropertyFilter />
-        <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
-        <div className={styles.property_grid}>{properties}</div>
-    </>)    
+        <>
+            <PropertyFilter onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
+            <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
+            <div className={styles.property_grid}>{properties}</div>
+        </>
+    )    
 }
 
+/**
+ * The component to display a property. 
+ * @param {string} photo - The first photo URL of the property.
+ * @param {number} price - The listing price of the property.
+ * @param {string} address - The address line of the property.
+ * @param {string} zip - The zip code of the property.
+ * @param {string} city - The city of the property.
+ * @param {string} state - The state of the property.
+ * @param {number} beds - The number of beds that the property has.
+ * @param {number} beds - The number of baths that the property has.
+ */
 function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sqft }) {
     const [photoIsLoading, setPhotoIsLoading] = useState(true);
 
@@ -125,62 +197,126 @@ function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sq
     )
 }
 
-function PropertyFilter() {
-    // TODO: Filter for city, zip code, min price, max price, beds (dropdown), baths (dropdown).
-    const [minPrice, setMinPrice] = useState(0);
-    const [maxPrice, setMaxPrice] = useState(0);
-
-    // TODO: Fix this. Does not work properly.
-    /*
-    if (minPrice > maxPrice) {
-        setMaxPrice(minPrice);
-    }
-    else if (maxPrice < minPrice) {
-        setMinPrice(maxPrice);
-    }
-    */
-
-    console.log(`minPrice: ${minPrice}`);
-    console.log(`maxPrice: ${maxPrice}`);
+/**
+ * A component to filter the list of properties. 
+ * @param {function} onSubmit - To handle the submission of the filters form. 
+ * @param {function} onFilterChange - To handle changes within the filters form. 
+ * @param {function} onClearFilters - To handle clearing the previous filters. 
+ * @param {object} filters - Keys representing the names of the filters and their values. 
+ */
+function PropertyFilter({ onSubmit, onFilterChange, onClearFilters, filters }) {
 
     return (
         <div className={styles.filter_container}>
-            <form>
+            <form onSubmit={(e) => onSubmit(e)}>
                 <div className={styles.filter_grid}>
                     <div>
                         <label htmlFor="city">City</label><br></br>
-                        <input id={styles.city} className={styles.filter_input} type="text"></input>            
+                        <input name="city" id={styles.city} className={styles.filter_input} type="text" value={filters.city || ''} onChange={(e) => onFilterChange(e)}></input>            
                     </div>
 
                     <div>
                         <label htmlFor="zip">Zip</label><br></br>                   
-                        <input id={styles.zip} className={styles.filter_input} type="text"></input>
+                        <input name="zip" id={styles.zip} className={styles.filter_input} type="text" value={filters.zip || ''} onChange={(e) => onFilterChange(e)}></input>
                     </div>                                                        
                                                                                 
                     <div>
-                        <label htmlFor="min_price">Min Price</label><br></br>             
-                        <input id={styles.min_price} className={styles.filter_input} type="number" min="0" value={minPrice} onChange={(e) => setMinPrice(e.target.value)}></input>
+                        <label htmlFor="minPrice">Min Price</label><br></br>             
+                        <input name="minPrice" id={styles.min_price} className={styles.filter_input} type="number" min="0" value={filters.minPrice || ''} onChange={(e) => onFilterChange(e)}></input>
                     </div>
             
                     <div>
-                        <label htmlFor="max_price">Max Price</label><br></br>               
-                        <input id={styles.max_price} className={styles.filter_input} type="number" min="0" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}></input>
+                        <label htmlFor="maxPrice">Max Price</label><br></br>               
+                        <input name="maxPrice" id={styles.max_price} className={styles.filter_input} type="number" min="0" value={filters.maxPrice || ''} onChange={(e) => onFilterChange(e)}></input>
                     </div>
-
                 <div className={styles.bed_baths_grid}>
                     <div>
                         <label htmlFor="beds">Beds</label><br></br>            
-                        <select id={styles.beds} className={styles.filter_input}></select>
+                        <select name="beds" id={styles.beds} className={styles.filter_input} value={filters.beds} onChange={(e) => onFilterChange(e)}>
+                            <option value=""></option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="26">26</option>
+                            <option value="32">32</option>
+                            <option value="35">35</option>
+                            <option value="39">39</option>
+                            <option value="45">45</option>
+                            <option value="52">52</option>
+                        </select>
                     </div>
                     <div>
                         <label htmlFor="baths">Baths</label><br></br>                  
-                        <select id={styles.baths} className={styles.filter_input} ></select>
+                        <select name="baths" id={styles.baths} className={styles.filter_input} value={filters.baths} onChange={(e) => onFilterChange(e)}>
+                            <option value=""></option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="22">22</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="27">27</option>
+                            <option value="32">32</option>
+                            <option value="46">46</option>
+                            <option value="58">58</option>
+                            <option value="59">59</option>
+                        </select>
                     </div>
                </div>
                </div>
-
-                <button id={styles.filter_submit} className={styles.filter_input} type="submit">Filter</button>
+                <button id={styles.filter_submit} className={styles.filter_button} type="submit">Filter</button>
+                <button id={styles.filter_clear} className={styles.filter_button} type="button" onClick={() => onClearFilters()}>Clear filters</button>
             </form>
         </div>
     )
+}
+
+/**
+ * Convert the object of filters into an HTTP parameters request.
+ * @param {object} filters - Keys representing the names of the filters and their values. 
+ * @returns a string.
+ */
+function filtersToString(filters) {
+    let filtersString = '';
+    Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+            filtersString += `&${key}=${filters[key]}`
+        }
+    });
+
+    return filtersString;
 }
