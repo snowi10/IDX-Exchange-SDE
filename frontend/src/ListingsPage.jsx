@@ -15,21 +15,21 @@ export default function ListingsPage() {
     const [submitted, setSubmitted] = useState(false);
     const [filters, setFilters] = useState({});
 
-    // Handle filters form submission in the PropertyFilter component.
+    // Handle filters form submission in the PropertyFilters component.
     function handleOnSubmit(e) {
         e.preventDefault();
         setSubmitted(true);
     }
     
-    // Handle changing filters in the PropertyFilter component.
+    // Handle changing filters in the PropertyFilters component.
     function handleFilterChange(e) {
         setSubmitted(false);
         setFilters({... filters, [e.target.name]: e.target.value});
     }
 
-    // Handle clearing filters in the PropertyFilter component.
+    // Handle clearing filters in the PropertyFilters component.
     function handleClearFilters() {
-        setSubmitted(false);
+        setSubmitted(true);
         setFilters({});
         setFiltersHistory({});
     }
@@ -38,7 +38,7 @@ export default function ListingsPage() {
     useEffect(() => {
         const fetchDefaultProperties = async () => {
             try {
-                let response = await fetchProperties();
+                let response = await fetchProperties('');
                 await createPropertyCards(response, setErrorMessage, setProperties, setTotalProperties);
             }
             catch (error) {
@@ -68,6 +68,7 @@ export default function ListingsPage() {
                 setErrorMessage(error.message);
             }
             finally {
+                setSubmitted(false);
                 setLoading(false); 
             }
         }
@@ -87,7 +88,7 @@ export default function ListingsPage() {
     if (loading) {
         return (
             <>
-                <PropertyFilter onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
+                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
                 <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
                 <div>Loading...</div>
             </>
@@ -98,7 +99,7 @@ export default function ListingsPage() {
     if (totalProperties === 0) {
         return (
             <>
-                <PropertyFilter onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
+                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
                 <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
                 <div>No properties found.</div>
             </>
@@ -108,7 +109,7 @@ export default function ListingsPage() {
     // UI for properties list.
     return (
         <>
-            <PropertyFilter onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
+            <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
             <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
             <div className={styles.property_grid}>{properties}</div>
         </>
@@ -161,7 +162,7 @@ function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sq
  * @param {function} onClearFilters - To handle clearing the previous filters. 
  * @param {object} filters - Keys representing the names of the filters and their values. 
  */
-function PropertyFilter({ onSubmit, onFilterChange, onClearFilters, filters }) {
+export function PropertyFilters({ onSubmit, onFilterChange, onClearFilters, filters }) {
 
     return (
         <div className={styles.filter_container}>
@@ -169,27 +170,27 @@ function PropertyFilter({ onSubmit, onFilterChange, onClearFilters, filters }) {
                 <div className={styles.filter_grid}>
                     <div>
                         <label htmlFor="city">City</label><br></br>
-                        <input name="city" id={styles.city} className={styles.filter_input} type="text" value={filters.city || ''} onChange={(e) => onFilterChange(e)}></input>            
+                        <input name="city" id={styles.city} data-testid="city" className={styles.filter_input} type="text" value={filters?.city || ''} onChange={(e) => onFilterChange(e)}></input>            
                     </div>
 
                     <div>
                         <label htmlFor="zip">Zip</label><br></br>                   
-                        <input name="zip" id={styles.zip} className={styles.filter_input} type="text" value={filters.zip || ''} onChange={(e) => onFilterChange(e)}></input>
+                        <input name="zip" id={styles.zip} className={styles.filter_input} type="text" value={filters?.zip || ''} onChange={(e) => onFilterChange(e)}></input>
                     </div>                                                        
                                                                                 
                     <div>
                         <label htmlFor="minPrice">Min Price</label><br></br>             
-                        <input name="minPrice" id={styles.min_price} className={styles.filter_input} type="number" min="0" value={filters.minPrice || ''} onChange={(e) => onFilterChange(e)}></input>
+                        <input name="minPrice" id={styles.min_price} className={styles.filter_input} type="number" min="0" value={filters?.minPrice || ''} onChange={(e) => onFilterChange(e)}></input>
                     </div>
             
                     <div>
                         <label htmlFor="maxPrice">Max Price</label><br></br>               
-                        <input name="maxPrice" id={styles.max_price} className={styles.filter_input} type="number" min="0" value={filters.maxPrice || ''} onChange={(e) => onFilterChange(e)}></input>
+                        <input name="maxPrice" id={styles.max_price} className={styles.filter_input} type="number" min="0" value={filters?.maxPrice || ''} onChange={(e) => onFilterChange(e)}></input>
                     </div>
                 <div className={styles.bed_baths_grid}>
                     <div>
                         <label htmlFor="beds">Beds</label><br></br>            
-                        <select name="beds" id={styles.beds} className={styles.filter_input} value={filters.beds} onChange={(e) => onFilterChange(e)}>
+                        <select name="beds" id={styles.beds} className={styles.filter_input} value={filters?.beds} onChange={(e) => onFilterChange(e)}>
                             <option value=""></option>
                             <option value="0">0</option>
                             <option value="1">1</option>
@@ -221,7 +222,7 @@ function PropertyFilter({ onSubmit, onFilterChange, onClearFilters, filters }) {
                     </div>
                     <div>
                         <label htmlFor="baths">Baths</label><br></br>                  
-                        <select name="baths" id={styles.baths} className={styles.filter_input} value={filters.baths} onChange={(e) => onFilterChange(e)}>
+                        <select name="baths" id={styles.baths} className={styles.filter_input} value={filters?.baths} onChange={(e) => onFilterChange(e)}>
                             <option value=""></option>
                             <option value="0">0</option>
                             <option value="1">1</option>
@@ -269,20 +270,12 @@ function PropertyFilter({ onSubmit, onFilterChange, onClearFilters, filters }) {
  * @param {function} setProperties - Handle setting the list of PropertyCard components.
  * @param {function} setTotalProperties - Handle setting the total number of properties from the JSON response.
  */
-async function createPropertyCards(response, setErrorMessage, setProperties, setTotalProperties) {
-                // Handle errors from JSON response.
-    if (response.status !== 200) {
-    const json = await response.json();
-    setErrorMessage(`${json.status}, 
-        ${json.error}`);
-    }
-    else {
-    const json = await response.json();
+async function createPropertyCards(propertyData, setErrorMessage, setProperties, setTotalProperties) {
     let updatedProperties = [];
 
     // Create PropertyCard components for each property.
-    for (let i = 0; i < json.results.length; i++) {
-        const result = json.results[i];
+    for (let i = 0; i < propertyData.results.length; i++) {
+        const result = propertyData.results[i];
         const photo = result.L_Photos ? JSON.parse(result.L_Photos)[0] : 'Photo Unavailable';
         const price = result.L_SystemPrice;
         const address = result.L_Address;
@@ -307,9 +300,7 @@ async function createPropertyCards(response, setErrorMessage, setProperties, set
     }
 
     setProperties(updatedProperties);
-    setTotalProperties(json.total);
-    }
-
+    setTotalProperties(propertyData.total);
 }
 
 /**
