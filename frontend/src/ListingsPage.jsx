@@ -88,7 +88,7 @@ export default function ListingsPage() {
     if (loading) {
         return (
             <>
-                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
+                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
                 <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
                 <div>Loading...</div>
             </>
@@ -99,7 +99,7 @@ export default function ListingsPage() {
     if (totalProperties === 0) {
         return (
             <>
-                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} filters={filters}/>
+                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
                 <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
                 <div>No properties found.</div>
             </>
@@ -138,6 +138,7 @@ function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sq
     const placeholder = photoIsLoading ? {display: "block"} : {display: "none"};
 
     // TODO: Handle empty strings in the description container.
+    // TODO: Add commas to prices.
     return (
         <div className={styles.property_card} >
             <div className={styles.image_container} style={actual}>
