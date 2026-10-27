@@ -14,8 +14,9 @@ body {
 
 .property_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 400px));
     grid-template-rows: repeat(auto-fill, minmax(40px, 1fr));
+    justify-content: center;
 }
 
 .property_card {
@@ -101,7 +102,7 @@ body {
     height: 30px;
     padding-left: 10px;
     background-color:rgb(250, 241, 229);
-    border: 1.5px solid  black ;
+    border: 1px solid  black ;
     border-radius: 15px;
 }
 
@@ -114,13 +115,28 @@ body {
     width: 50%;
 }
 
-#filter_submit {
+.filter_button {
     position: relative;
-    margin-top: 15px;
-    width: 100px;
     color: black;
-    background-color: lightgray; /* TODO: Maybe change this color */
+    background-color: lightgray;
+    border: 1px solid  black ;
+    border-radius: 15px;
     font-family: 'CharisSil';
     font-size: 01em;
-    overflow:hidden;
+    overflow: hidden; 
+} 
+
+.filter_button:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+
+#filter_submit {
+    margin-top: 15px;
+    width: 70px;
+}
+
+#filter_clear {
+    margin-left: 1.5%;
+    width: 120px;
 }
