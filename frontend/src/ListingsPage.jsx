@@ -191,7 +191,7 @@ export function PropertyFilters({ onSubmit, onFilterChange, onClearFilters, filt
                 <div className={styles.bed_baths_grid}>
                     <div>
                         <label htmlFor="beds">Beds</label><br></br>            
-                        <select name="beds" id={styles.beds} className={styles.filter_input} value={filters?.beds} onChange={(e) => onFilterChange(e)}>
+                        <select name="beds" id={styles.beds} className={styles.filter_input} value={filters?.beds || ''} onChange={(e) => onFilterChange(e)}>
                             <option value=""></option>
                             <option value="0">0</option>
                             <option value="1">1</option>
@@ -223,7 +223,7 @@ export function PropertyFilters({ onSubmit, onFilterChange, onClearFilters, filt
                     </div>
                     <div>
                         <label htmlFor="baths">Baths</label><br></br>                  
-                        <select name="baths" id={styles.baths} className={styles.filter_input} value={filters?.baths} onChange={(e) => onFilterChange(e)}>
+                        <select name="baths" id={styles.baths} className={styles.filter_input} value={filters?.baths || ''} onChange={(e) => onFilterChange(e)}>
                             <option value=""></option>
                             <option value="0">0</option>
                             <option value="1">1</option>
