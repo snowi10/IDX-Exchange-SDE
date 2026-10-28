@@ -2,6 +2,7 @@
 export async function fetchProperties(params) {
         const response = await fetch(`/api/properties?${params}`)
 
+        // Handle responses with an error.
         if (response.status !== 200) {
             throw new Error(`Failed to fetch properties. \nStatus: ${response.status}.`)
         }
