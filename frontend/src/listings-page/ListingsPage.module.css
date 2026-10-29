@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'CharisSIL';
+    src: url('../assets/CharisSIL-Regular.ttf');
+}
+
+body {
+    background-color:rgb(250, 241, 229);
+    font-family: 'CharisSIL';
+}
+
+#showing {
+    text-align: right;
+}
+
+.property_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 25%));
+    grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
+    justify-content: center;
+}

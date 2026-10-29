@@ -1,0 +1,51 @@
+.property_card {
+    margin: 5%; 
+    background-color:white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    overflow: hidden;
+}
+
+.property_card:hover {
+    box-shadow: 0 10px 15px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.image_container {
+    display: block;
+    height: 200px;
+    overflow: hidden;
+    object-fit: contain;
+}
+
+.image_container img {
+    display: block;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.description_container {
+    display: block;
+    position: relative;
+    bottom: 2%;
+    padding: 2px 16px;
+    object-fit: fill;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    line-height: 1;
+    overflow: hidden;
+}
+
+#price {
+    font-size: 150%;
+    font-weight: bold;
+}
+
+#address {
+    font-size: 120%;
+    font-weight: bold;
+}

@@ -1,6 +1,6 @@
 import { test, describe, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PropertyFilters } from "../ListingsPage";
+import { PropertyFilters } from '../listings-page/components/proprety-filters/PropertyFilters';
 
 describe('PropertyFilters', () => {
     test('display filters from user input', async () => {

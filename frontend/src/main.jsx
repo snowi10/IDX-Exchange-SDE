@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from "react-router";
-import ListingsPage from './ListingsPage.jsx';
+import { BrowserRouter, Routes, Route } from 'react-router';
+import ListingsPage from './listings-page/ListingsPage';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
