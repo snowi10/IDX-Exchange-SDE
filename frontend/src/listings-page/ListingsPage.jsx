@@ -18,8 +18,10 @@ export default function ListingsPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(0);
 
+    // The first number and the last number of the properties in a page. 
     const firstPropertyNum = (itemsPerPage * currentPage) + 1;
-    const lastPropertyNum = (currentPage + 1) * itemsPerPage ;
+    let lastPropertyNum = (currentPage + 1) * itemsPerPage;
+    lastPropertyNum = lastPropertyNum > totalProperties ? totalProperties : lastPropertyNum;
 
     // Handle filters form submission in the PropertyFilters component.
     function handleOnSubmit(e) {
@@ -29,6 +31,8 @@ export default function ListingsPage() {
         setCurrentPage(0);
     }
     
+    // TODO: Create function for not letting minPrice be greater than maxPrice
+    // and maxPrice be less than minPrice.
     // Handle changing filters in the PropertyFilters component.
     function handleFilterChange(e) {
         setSubmitted(false);
@@ -46,16 +50,11 @@ export default function ListingsPage() {
     function handlePrevClick() {
         const prevPage = currentPage - 1;
 
+        // Only move to the previous page if applicable.
         if (currentPage > 0) {
             setSubmitted(true);
             setCurrentPage(prevPage);
-
-            if (filters?.limit) {
-                setFilters({... filters, offset: (prevPage) * filters.limit});
-            }
-            else {
-                setFilters({... filters, offset: (prevPage) * 20});
-            }
+            setFilters({... filters, offset: (prevPage) * itemsPerPage})
         }
     }
 
@@ -63,18 +62,11 @@ export default function ListingsPage() {
     function handleNextClick() {
         const nextPage = currentPage + 1;
 
+        // Only move to the next page if applicable.
         if (lastPropertyNum + 1 < totalProperties) {
             setSubmitted(true);
             setCurrentPage(nextPage);
- 
-            if (filters?.limit) {
-                console.log('true');
-                setFilters({... filters, offset: (nextPage) * filters.limit});
-            }
-            else {
-                console.log('false');
-                setFilters({... filters, offset: (nextPage) * 20});
-          }
+            setFilters({... filters, offset: (nextPage) * itemsPerPage})
        }
     }
 
@@ -84,13 +76,13 @@ export default function ListingsPage() {
             try {
                 let filtersString = filtersToString(filters);
                 let response = await fetchProperties(filtersString);
-                createPropertyCards(response, setProperties, setTotalProperties, setItemsPerPage, setCurrentPage);
+                let defaultLimit = createPropertyCards(response, setProperties, setTotalProperties, setCurrentPage);
+                setItemsPerPage(defaultLimit);
             }
             catch (error) {
                 setErrorMessage(error.message);
             }
             finally {
-                setCurrentPage(0);
                 setLoading(false);
             }
         }
@@ -107,9 +99,11 @@ export default function ListingsPage() {
                     setLoading(true);
                     let filtersString = filtersToString(filters);
                     let response = await fetchProperties(filtersString);
-                    createPropertyCards(response, setProperties, setTotalProperties, setItemsPerPage, setCurrentPage);
-                    console.log('Current page: ' + currentPage);
-                    console.log(filters);
+                    createPropertyCards(response, setProperties, setTotalProperties, setCurrentPage);
+
+                    if (filters?.limit) {
+                        setItemsPerPage(filters.limit);
+                    }
                 }
             }
             catch (error) {
@@ -152,6 +146,7 @@ export default function ListingsPage() {
             </>
         )
     }
+    
 
     // UI for properties list.
     return (
@@ -159,7 +154,7 @@ export default function ListingsPage() {
             <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
             <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
             <div className={styles.property_grid}>{properties}</div>
-            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} currentPage={currentPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties}/> 
+            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} currentPage={currentPage} itemsPerPage={itemsPerPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties}/> 
         </>
     )    
 }
@@ -169,22 +164,23 @@ export default function ListingsPage() {
  * @param {json} response - The JSON response of the list of properties. 
  * @param {function} setProperties - Handle setting the list of PropertyCard components.
  * @param {function} setTotalProperties - Handle setting the total number of properties from the JSON response.
+ * @return the number of property cards created.
  */
-function createPropertyCards(propertyData, setProperties, setTotalProperties, setItemsPerPage) {
+function createPropertyCards(propertyData, setProperties, setTotalProperties) {
     let updatedProperties = [];
 
     // Create PropertyCard components for each property.
     for (let i = 0; i < propertyData.results.length; i++) {
         const result = propertyData.results[i];
         const photo = result.L_Photos ? JSON.parse(result.L_Photos)[0] : 'Photo Unavailable';
-        const price = result.L_SystemPrice;
+        const price = result.L_SystemPrice ? parseInt(result.L_SystemPrice) : 'N/A';
         const address = result.L_Address;
         const city = result.L_City;
         const zip = result.L_Zip;
         const state = result.L_State;
-        const beds = result.L_Keyword2;
-        const baths = parseInt(result.LM_Dec_3);
-        const sqft = result.LM_Int2_3;
+        const beds = result.L_Keyword2? parseInt(result.L_Keyword2) : 'N/A';
+        const baths = result.LM_Dec_3 ? parseInt(result.LM_Dec_3) : 'N/A';
+        const sqft = result.LM_Int2_3 ? parseInt(result.LM_Int2_3) : 'N/A';
 
         updatedProperties.push(<PropertyCard 
             key={i} 
@@ -200,14 +196,15 @@ function createPropertyCards(propertyData, setProperties, setTotalProperties, se
     }
 
     setProperties(updatedProperties);
-    setItemsPerPage(updatedProperties.length);
     setTotalProperties(propertyData.total);
+
+    return updatedProperties.length;
 }
 
 /**
  * Convert the object of filters into an HTTP parameters request.
  * @param {object} filters - Keys representing the names of the filters and their values. 
- * @returns a string.
+ * @returns the string of filters converted to an HTTP parameters request.
  */
 function filtersToString(filters) {
     let filtersString = '';
