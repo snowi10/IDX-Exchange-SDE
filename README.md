@@ -1,5 +1,5 @@
 # IDX-Exchange-SDE
-A mock real estate marketplace website as an intern project at IDX Exchange.
+A mock real estate marketplace website as an internship project at IDX Exchange.
 ## Progress
 - Retrieves property details from the backend.
 - Displays properties in the frontend.
