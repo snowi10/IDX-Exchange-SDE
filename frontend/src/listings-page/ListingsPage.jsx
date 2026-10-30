@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchProperties } from '../api/client';
 import { PropertyCard } from './components/property-card/PropertyCard';
 import { PropertyFilters }  from './components/property-filters/PropertyFilters';
+import { Pagination } from './components/pagination/Pagination';
 import styles from './ListingsPage.module.css';
 
 /**
@@ -14,11 +15,18 @@ export default function ListingsPage() {
     const [totalProperties, setTotalProperties] = useState(0);
     const [submitted, setSubmitted] = useState(false);
     const [filters, setFilters] = useState({});
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(0);
+
+    const firstPropertyNum = (itemsPerPage * currentPage) + 1;
+    const lastPropertyNum = (currentPage + 1) * itemsPerPage ;
 
     // Handle filters form submission in the PropertyFilters component.
     function handleOnSubmit(e) {
         e.preventDefault();
         setSubmitted(true);
+        setFilters({ ...filters, offset: 0});
+        setCurrentPage(0);
     }
     
     // Handle changing filters in the PropertyFilters component.
@@ -31,20 +39,58 @@ export default function ListingsPage() {
     function handleClearFilters() {
         setSubmitted(true);
         setFilters({});
-        setFiltersHistory({});
+        setCurrentPage(0);
+    }
+
+    // Handle moving to the previous page.
+    function handlePrevClick() {
+        const prevPage = currentPage - 1;
+
+        if (currentPage > 0) {
+            setSubmitted(true);
+            setCurrentPage(prevPage);
+
+            if (filters?.limit) {
+                setFilters({... filters, offset: (prevPage) * filters.limit});
+            }
+            else {
+                setFilters({... filters, offset: (prevPage) * 20});
+            }
+        }
+    }
+
+    // Handle moving to the next page.
+    function handleNextClick() {
+        const nextPage = currentPage + 1;
+
+        if (lastPropertyNum + 1 < totalProperties) {
+            setSubmitted(true);
+            setCurrentPage(nextPage);
+ 
+            if (filters?.limit) {
+                console.log('true');
+                setFilters({... filters, offset: (nextPage) * filters.limit});
+            }
+            else {
+                console.log('false');
+                setFilters({... filters, offset: (nextPage) * 20});
+          }
+       }
     }
 
     // Fetch default properties when first loading the page.
     useEffect(() => {
         const fetchDefaultProperties = async () => {
             try {
-                let response = await fetchProperties('');
-                await createPropertyCards(response, setProperties, setTotalProperties);
+                let filtersString = filtersToString(filters);
+                let response = await fetchProperties(filtersString);
+                createPropertyCards(response, setProperties, setTotalProperties, setItemsPerPage, setCurrentPage);
             }
             catch (error) {
                 setErrorMessage(error.message);
             }
             finally {
+                setCurrentPage(0);
                 setLoading(false);
             }
         }
@@ -61,7 +107,9 @@ export default function ListingsPage() {
                     setLoading(true);
                     let filtersString = filtersToString(filters);
                     let response = await fetchProperties(filtersString);
-                    await createPropertyCards(response, setProperties, setTotalProperties);
+                    createPropertyCards(response, setProperties, setTotalProperties, setItemsPerPage, setCurrentPage);
+                    console.log('Current page: ' + currentPage);
+                    console.log(filters);
                 }
             }
             catch (error) {
@@ -89,7 +137,6 @@ export default function ListingsPage() {
         return (
             <>
                 <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
-                <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
                 <div>Loading...</div>
             </>
         )
@@ -100,7 +147,7 @@ export default function ListingsPage() {
         return (
             <>
                 <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
-                <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
+                <div id={styles.showing}>Showing {totalProperties} out of {totalProperties} properties</div>
                 <div>No properties found.</div>
             </>
         )
@@ -110,8 +157,9 @@ export default function ListingsPage() {
     return (
         <>
             <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
-            <div id={styles.showing}>Showing {properties.length} out of {totalProperties} properties</div>
+            <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
             <div className={styles.property_grid}>{properties}</div>
+            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} currentPage={currentPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties}/> 
         </>
     )    
 }
@@ -122,7 +170,7 @@ export default function ListingsPage() {
  * @param {function} setProperties - Handle setting the list of PropertyCard components.
  * @param {function} setTotalProperties - Handle setting the total number of properties from the JSON response.
  */
-async function createPropertyCards(propertyData, setProperties, setTotalProperties) {
+function createPropertyCards(propertyData, setProperties, setTotalProperties, setItemsPerPage) {
     let updatedProperties = [];
 
     // Create PropertyCard components for each property.
@@ -152,6 +200,7 @@ async function createPropertyCards(propertyData, setProperties, setTotalProperti
     }
 
     setProperties(updatedProperties);
+    setItemsPerPage(updatedProperties.length);
     setTotalProperties(propertyData.total);
 }
 
