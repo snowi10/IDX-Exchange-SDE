@@ -17,8 +17,10 @@ import styles from './PropertyCard.module.css';
 export function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sqft }) {
     const [photoIsLoading, setPhotoIsLoading] = useState(true);
 
+    const fullAddress = createFullAddress(address, city, state, zip);
+
     // Replace properties with no photos.
-    photo = photo === 'Photo Unavailable' ? photo_unavailable : photo;
+    const displayPhoto = photo === 'Photo Unavailable' ? photo_unavailable : photo;
 
     // Set placeholder cards for photos that are still loading.
     const actual = photoIsLoading ? {display: "none"} : {display : "block"};
@@ -29,7 +31,7 @@ export function PropertyCard({ photo, price, address, zip, city, state, beds, ba
     return (
         <div className={styles.property_card} >
             <div className={styles.image_container} style={actual}>
-                <img src={photo} onLoad={() => setPhotoIsLoading(false)}></img>
+                <img src={displayPhoto} onLoad={() => setPhotoIsLoading(false)}></img>
             </div>   
             <div className={styles.image_container} style={placeholder}>
                 <img src={loading_photo}></img>
@@ -37,8 +39,58 @@ export function PropertyCard({ photo, price, address, zip, city, state, beds, ba
             <div className={styles.description_container}>
                 <p id={styles.price}>${price}</p>
                 <p><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Sqft</b>: {sqft}</p>
-                <p id={styles.address}>{address}, {city}, {state} {zip}</p>
+                <p id={styles.address}>{fullAddress}</p>
             </div>
         </div>
     )
+}
+
+/**
+ * Create the full address of a property based on the address, city, state, and zip code.
+ * @param {string} address - The address of the property. 
+ * @param {string} city  - The city of the property.
+ * @param {string} state - The state of the property.
+ * @param {string} zip - The zip code of the property. 
+ * @returns a string of the full address of a property.
+ */
+function createFullAddress(address, city, state, zip) {
+    let fullAddressBuilder = [];
+
+    // Address.
+    if (address) {
+        fullAddressBuilder.push(address);
+    }
+
+    // City.
+    if (city && address) {
+        fullAddressBuilder.push(`, ${city}`);
+    }
+    else if (city) {
+        fullAddressBuilder.push(city);
+    }
+
+    // State.
+    if (state && (address || city)) {
+        fullAddressBuilder.push(`, ${state}`);
+    }
+    else if (state) {
+        fullAddressBuilder.push(state);
+    }
+
+    // Zip code.
+    if (zip && parseInt(zip) !== 0) {
+        if (state) {
+            fullAddressBuilder.push(` ${zip}`);
+        }
+        else if (address || city) {
+            fullAddressBuilder.push(`, ${zip}`);
+        }
+        else  {
+            fullAddressBuilder.push(zip);
+        }
+    }
+
+    const fullAddress = fullAddressBuilder? fullAddressBuilder.join('') : ''; 
+
+    return fullAddress;
 }
