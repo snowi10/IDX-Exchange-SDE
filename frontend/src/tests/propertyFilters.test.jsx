@@ -36,4 +36,3 @@ describe('PropertyFilters', () => {
         expect(screen.getByText('Cleared')).toBeInTheDocument();
     });
 });
-
