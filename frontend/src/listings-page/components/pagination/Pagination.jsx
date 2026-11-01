@@ -1,34 +1,17 @@
 import styles from './Pagination.module.css';
 
-export function Pagination({ onPrevClick, onNextClick, currentPage, itemsPerPage, firstPropertyNum, lastPropertyNum, totalProperties }) {
-    const pageNumber = currentPage + 1;
+/**
+ * A component to move to the previous or next page of property listings.
+ * @param {function} onPrevClick - To handle moving to the previous page.
+ * @param {function} onNextClick - To handle moving to the next page.
+ * @param {number} firstPropertyNum - The number of the first property on the page.
+ * @param {number} lastPropertyNum - The number of the last property on the page.
+ * @param {number} totalProperties - The number of the last property on the page.
+ * @param {array} pageButtons - A list of buttons for moving to different pages.
+ */
+export function Pagination({ onPrevClick, onNextClick, firstPropertyNum, lastPropertyNum, totalProperties, pageButtons }) {
     let prevButtonStyle = styles.pagination_button;
     let nextButtonStyle = styles.pagination_button;
-    let pageButtons = [];
-
-    if (Math.ceil(totalProperties/itemsPerPage) > 4) {
-
-        // TODO: Display page buttons in groups of 4.
-
-        for (let i = 0; i < 4; i++) {
-            let page = i + 1;
-
-            if (i === 0) {
-                pageButtons.push(<p style={{display: 'inline'}} key={page}><button>{page}</button>...</p>);
-            }
-            else {
-                pageButtons.push(<p style={{display: 'inline'}} key={page}><button>{page}</button></p>)
-            }
-        }
-    }
-    else {
-        const numberOfPages = Math.ceil(totalProperties/itemsPerPage);
-        for (let i = 0; i < numberOfPages; i++) {
-            let page = i + 1;
-            pageButtons.push(<p style={{display: 'inline'}}><button key={page}>{page}</button></p>);
-        }
-    }
-
 
     // Disable prev and next buttons when there are no more pages.
     if (firstPropertyNum === 1) {

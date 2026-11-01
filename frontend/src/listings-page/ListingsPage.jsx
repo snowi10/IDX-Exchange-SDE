@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { fetchProperties } from '../api/client';
 import { PropertyCard } from './components/property-card/PropertyCard';
-import { PropertyFilters }  from './components/property-filters/PropertyFilters';
+import { PropertyFilters } from './components/property-filters/PropertyFilters';
 import { Pagination } from './components/pagination/Pagination';
+import { createPageButtons } from './pageButtons';
 import styles from './ListingsPage.module.css';
 
 /**
@@ -14,9 +15,12 @@ export default function ListingsPage() {
     const [properties, setProperties] = useState([])
     const [totalProperties, setTotalProperties] = useState(0);
     const [submitted, setSubmitted] = useState(false);
-    const [filters, setFilters] = useState({});
+    const [filters, setFilters] = useState({beds: 8});
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(0);
+    const [pageButtons, setPageButtons] = useState([]);
+
+    const filtersString = filtersToString(filters);
 
     // The first number and the last number of the properties in a page. 
     const firstPropertyNum = (itemsPerPage * currentPage) + 1;
@@ -70,14 +74,22 @@ export default function ListingsPage() {
        }
     }
 
+    // TODO: Fill in this function to move to a certain page 
+    // when a user clicks on a page number button.
+    function handlePageClick(e) {
+        setSubmitted(true);
+    }
+
     // Fetch default properties when first loading the page.
     useEffect(() => {
         const fetchDefaultProperties = async () => {
             try {
-                let filtersString = filtersToString(filters);
-                let response = await fetchProperties(filtersString);
-                let defaultLimit = createPropertyCards(response, setProperties, setTotalProperties, setCurrentPage);
-                setItemsPerPage(defaultLimit);
+                const response = await fetchProperties(filtersString);
+                const { updatedProperties, propertyData } = createPropertyCards(response, setProperties, setTotalProperties, setItemsPerPage, setPageButtons, currentPage);
+                setProperties(updatedProperties);
+                setTotalProperties(propertyData.total);
+                setItemsPerPage(updatedProperties.length); // Default items per page on the first load of the page.
+                setPageButtons(createPageButtons(currentPage, propertyData.total, updatedProperties.length, handlePageClick));
             }
             catch (error) {
                 setErrorMessage(error.message);
@@ -97,13 +109,21 @@ export default function ListingsPage() {
             try {
                 if (submitted) {
                     setLoading(true);
-                    let filtersString = filtersToString(filters);
-                    let response = await fetchProperties(filtersString);
-                    createPropertyCards(response, setProperties, setTotalProperties, setCurrentPage);
+                    const response = await fetchProperties(filtersString);
+                    const { updatedProperties, propertyData } = createPropertyCards(response);
+                    setProperties(updatedProperties);
+                    setTotalProperties(propertyData.total);
 
+                    // Use the limit added in the filters for specifying items per page.
+                    // Otherwise, use the default items per page that was set on the first load of the page.
                     if (filters?.limit) {
                         setItemsPerPage(filters.limit);
+                        setPageButtons(createPageButtons(currentPage, propertyData.total, filters.limit, handlePageClick));
                     }
+                    else {
+                        setPageButtons(createPageButtons(currentPage, propertyData.total, itemsPerPage, handlePageClick));
+                    }
+
                 }
             }
             catch (error) {
@@ -118,6 +138,7 @@ export default function ListingsPage() {
         fetchFilteredProperties(); 
 
     }, [submitted]);
+
 
     // TODO: Create better UI for error message.
     // UI for error messages.
@@ -147,26 +168,23 @@ export default function ListingsPage() {
         )
     }
     
-
     // UI for properties list.
     return (
         <>
             <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
             <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
             <div className={styles.property_grid}>{properties}</div>
-            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} currentPage={currentPage} itemsPerPage={itemsPerPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties}/> 
+            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties} pageButtons={pageButtons}/> 
         </>
     )    
 }
 
 /**
  * Create PropertyCard components for each property in the JSON response.
- * @param {json} response - The JSON response of the list of properties. 
- * @param {function} setProperties - Handle setting the list of PropertyCard components.
- * @param {function} setTotalProperties - Handle setting the total number of properties from the JSON response.
- * @return the number of property cards created.
+ * @param {json} propertyData - The JSON response of the list of properties. 
+ * @return a list of PropertyCard components and the JSON of property data.
  */
-function createPropertyCards(propertyData, setProperties, setTotalProperties) {
+function createPropertyCards(propertyData) {
     let updatedProperties = [];
 
     // Create PropertyCard components for each property.
@@ -195,16 +213,13 @@ function createPropertyCards(propertyData, setProperties, setTotalProperties) {
             sqft={sqft}/>)
     }
 
-    setProperties(updatedProperties);
-    setTotalProperties(propertyData.total);
-
-    return updatedProperties.length;
+    return { updatedProperties, propertyData };
 }
 
 /**
  * Convert the object of filters into an HTTP parameters request.
  * @param {object} filters - Keys representing the names of the filters and their values. 
- * @returns the string of filters converted to an HTTP parameters request.
+ * @returns the HTTP parameters request in a string.
  */
 function filtersToString(filters) {
     let filtersString = '';

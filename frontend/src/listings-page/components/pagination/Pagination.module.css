@@ -1,3 +1,4 @@
+/* Start of Pagination component styling */
 .pagination_grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
@@ -15,6 +16,7 @@
 }
 
 .pagination_button {
+    display: inline;
     width: 50px; 
     height: 30%;
     color: black;
@@ -43,3 +45,6 @@
     font-size: 01em;
     overflow: hidden;
 }
+
+/* Start of PageButton component styling */
+
