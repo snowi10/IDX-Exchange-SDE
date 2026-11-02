@@ -9,7 +9,7 @@ import styles from './Pagination.module.css';
  * @param {number} itemsPerPage - The number of properties that is shown on each page.
  * @param {number} firstPropertyNum - The number of the first property on the page.
  * @param {number} lastPropertyNum - The number of the last property on the page.
- * @param {number} totalProperties - The number of the last property on the page.
+ * @param {number} totalProperties - The number of total property listings.
  */
 export function Pagination({ onPrevClick, onNextClick, onPageClick, currentPage, itemsPerPage, firstPropertyNum, lastPropertyNum, totalProperties}) {
     let prevButtonStyle = styles.pagination_button;
@@ -41,7 +41,6 @@ export function Pagination({ onPrevClick, onNextClick, onPageClick, currentPage,
    ) 
 }
 
-// TODO: Provide comments for this function and its helper functions.
 /**
  * Create buttons for moving to different pages.
  * @param {number} currentPage - The current page that the user is on.
@@ -53,25 +52,28 @@ export function Pagination({ onPrevClick, onNextClick, onPageClick, currentPage,
 function createPageButtons(currentPage, totalProperties, itemsPerPage, onPageClick) {
     const currentPageNumber = currentPage + 1;
     const numOfPages = Math.ceil(totalProperties/itemsPerPage);
-    const numOfPageButtons = 9;
-    const pageButtonsOffset = Math.floor(numOfPageButtons/2);
+    const numOfDynamicPageButtons = 6;
+    const dynamicPageButtonsOffset = Math.floor(numOfDynamicPageButtons/2);
     let pageButtonsBuilder = []; 
 
     // Format page buttons for property listings with more than 6 pages.
     if (numOfPages > 6) {
-        const startPage = calculateStartPage(currentPageNumber, numOfPages, numOfPageButtons, pageButtonsOffset);
-        const endPage = calculateEndPage(currentPageNumber, numOfPages, numOfPageButtons, pageButtonsOffset);
+        const dynamicPageButtonsStart = calculateStartPageButton(currentPageNumber, numOfPages, numOfDynamicPageButtons, dynamicPageButtonsOffset);
+        const dynamicPageButtonsEnd = calculateEndPageButton(currentPageNumber, numOfPages, numOfDynamicPageButtons, dynamicPageButtonsOffset);
 
-        formatFirstPageButton(startPage, currentPageNumber, pageButtonsBuilder, onPageClick);
+        // Button for the first page.
+        formatFirstPageButton(currentPageNumber, dynamicPageButtonsStart, pageButtonsBuilder, onPageClick);
         
-        for (let i = startPage; i <= endPage; i++) {
+        // Create dynamic page buttons depending on the current page number that the user is on.
+        for (let i = dynamicPageButtonsStart; i <= dynamicPageButtonsEnd; i++) {
             if (i !== 1 && i !== numOfPages) {
                 const colorStyle = setOnPageColor(currentPageNumber, i);
                 pageButtonsBuilder.push(<p key={i} style={{display: 'inline'}}><button style={colorStyle} className={styles.page_button} type="button" value={i} onClick={(e) => onPageClick(e)}>{i}</button></p>)
             }
         }
 
-        formatLastPageButton(currentPageNumber, endPage, numOfPages, pageButtonsBuilder, onPageClick);
+        // Button for the last page.
+        formatLastPageButton(currentPageNumber, dynamicPageButtonsEnd, numOfPages, pageButtonsBuilder, onPageClick);
     }
     // Format page buttons for property listings with 6 or less pages.
     else {
@@ -85,43 +87,76 @@ function createPageButtons(currentPage, totalProperties, itemsPerPage, onPageCli
     return pageButtonsBuilder;
 }
 
-function calculateStartPage(currentPageNumber, numOfPages, numOfPageButtons, pageButtonsOffset) {
-    if (numOfPageButtons > numOfPages) {
+/**
+ * Calculate the starting number of the dynamic page buttons.
+ * @param {number} currentPageNumber - The current page number that the user is on.
+ * @param {number} numOfPages - The number of pages that exist.
+ * @param {number} numOfDynamicPageButtons - The number of dynamic page buttons.
+ * @param {number} dynamicPageButtonsOffset - The offset number to manage how many dynamic page buttons to display on screen.
+ * @returns a number for indicating the start of the dynamic page buttons.
+ */
+function calculateStartPageButton(currentPageNumber, numOfPages, numOfDynamicPageButtons, dynamicPageButtonsOffset) {
+    // Return page number one if the number of dynamic page buttons to be displayed is greater
+    // than the number of existing pages.
+    if (numOfDynamicPageButtons > numOfPages) {
         return 1;
     }
     
-    if (currentPageNumber > numOfPageButtons - pageButtonsOffset && currentPageNumber > numOfPages - pageButtonsOffset) {
-        return numOfPages - numOfPageButtons;
+    // Handle start page button near the end of the number of pages.
+    if (currentPageNumber > numOfDynamicPageButtons - dynamicPageButtonsOffset && currentPageNumber > numOfPages - dynamicPageButtonsOffset) {
+        return numOfPages - numOfDynamicPageButtons;
     }
 
-    if (currentPageNumber > numOfPageButtons - pageButtonsOffset) {
-        return currentPageNumber - pageButtonsOffset;
+    // Handle start page button near the middle of the number of pages.
+    if (currentPageNumber > numOfDynamicPageButtons - dynamicPageButtonsOffset) {
+        return currentPageNumber - dynamicPageButtonsOffset;
     }
     
+    // Handle start page button near the beginning of the number of pages.
     return 1;
 }
 
-function calculateEndPage(currentPageNumber, numOfPages, numOfPageButtons, pageButtonsOffset) {
-    if (numOfPageButtons > numOfPages) {
+/**
+ * Calculate the ending number of the dynamic page buttons.
+ * @param {number} currentPageNumber - The current page number that the user is on.
+ * @param {number} numOfPages - The number of pages that exist.
+ * @param {number} numOfDynamicPageButtons - The number of dynamic page buttons.
+ * @param {number} dynamicPageButtonsOffset - The offset number to manage how many dynamic page buttons to display on screen.
+ * @returns a number for indicating the end of the dynamic page buttons. 
+ */
+function calculateEndPageButton(currentPageNumber, numOfPages, numOfDynamicPageButtons, dynamicPageButtonsOffset) {
+    // Return the last page number if the number of dynamic page buttons to be displayed is greater
+    // than the number of existing pages.
+    if (numOfDynamicPageButtons > numOfPages) {
         return numOfPages;
     }
 
-    if (currentPageNumber > numOfPageButtons - pageButtonsOffset && currentPageNumber + pageButtonsOffset < numOfPages) {
-        return currentPageNumber + pageButtonsOffset;
+    // Handle end page button near the middle of the number of pages.
+    if (currentPageNumber > numOfDynamicPageButtons - dynamicPageButtonsOffset && currentPageNumber + dynamicPageButtonsOffset < numOfPages) {
+        return currentPageNumber + dynamicPageButtonsOffset;
     }
 
-    if (currentPageNumber > numOfPageButtons - pageButtonsOffset) {
+    // Handle end page button near the end of the number of pages.
+    if (currentPageNumber > numOfDynamicPageButtons - dynamicPageButtonsOffset) {
         return numOfPages;
     }
 
-    return numOfPageButtons;
+    // Handle end page button near the beggining of the number of pages. 
+    return numOfDynamicPageButtons;
 }
 
-function formatFirstPageButton(startCurrentPages, currentPageNumber, pageButtonsBuilder, onPageClick) {
+/**
+ * Format the first page button.
+ * @param {number} currentPageNumber - The current page number that the user is on.
+ * @param {number} dynamicPageButtonsStart - The start number of the dynamic page buttons.
+ * @param {array} pageButtonsBuilder - The array containing the dynamic page buttons.
+ * @param {function} onPageClick - To handle clicking on the page button. 
+ */
+function formatFirstPageButton(currentPageNumber, dynamicPageButtonsStart, pageButtonsBuilder, onPageClick) {
     const colorStyle = setOnPageColor(currentPageNumber, 1);
 
-    // Add an ellipsis if the current page is not immediately after the first page.
-     if (startCurrentPages > 2) {
+    // Add an ellipsis if the start page number of the dynamic buttons is not immediately after the first page.
+     if (dynamicPageButtonsStart > 2) {
         pageButtonsBuilder.push(<p key={1} style={{display: 'inline'}}><button className={styles.page_button} type="button" value={1} onClick={(e) => onPageClick(e)}>1</button>...</p>)
     }
     else {
@@ -129,11 +164,19 @@ function formatFirstPageButton(startCurrentPages, currentPageNumber, pageButtons
     }
 }
 
-function formatLastPageButton(currentPageNumber, endCurrentPages, numOfPages, pageButtonsBuilder, onPageClick) {
+/**
+ * Format the last page button.
+ * @param {number} currentPageNumber - The current page number that the user is on.
+ * @param {number} dynamicPageButtonsEnd - The end number of the dynamic page buttons.
+ * @param {number} numOfPages - The number of the last page.
+ * @param {array} pageButtonsBuilder - The array containing the dynamic page buttons.
+ * @param {function} onPageClick - To handle clicking on the page button. 
+ */
+function formatLastPageButton(currentPageNumber, dynamicPageButtonsEnd, numOfPages, pageButtonsBuilder, onPageClick) {
     const colorStyle = setOnPageColor(currentPageNumber, numOfPages);
 
-    // Add an ellipsis if the current page is not immediately after the last page.
-    if (endCurrentPages < numOfPages - 1 ) {
+    // Add an ellipsis if the end page number of the dynamic buttons is not immediately after the last page.
+    if (dynamicPageButtonsEnd < numOfPages - 1 ) {
         pageButtonsBuilder.push(<p key={numOfPages} style={{display: 'inline'}}>...<button className={styles.page_button} type="button" value={numOfPages} onClick={(e) => onPageClick(e)}>{numOfPages}</button></p>)
     } 
     else {
@@ -141,7 +184,14 @@ function formatLastPageButton(currentPageNumber, endCurrentPages, numOfPages, pa
     }
 }
 
+/**
+ * Change the color of the page button depending on whether the user is on it or not.
+ * @param {number} currentPageNumber - The current page number that the user is on.
+ * @param {number} presentPageNumber - The page number that is currently being created.
+ * @returns an object for styling the page button.
+ */
 function setOnPageColor(currentPageNumber, presentPageNumber) {
+    // Change the color of the page button to lightgrey if the user is currently on it.
     if (currentPageNumber === presentPageNumber) {
         return {color: 'lightgrey', cursor: 'default'};
     }
