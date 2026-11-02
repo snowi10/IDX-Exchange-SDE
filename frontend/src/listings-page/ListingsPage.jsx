@@ -3,7 +3,6 @@ import { fetchProperties } from '../api/client';
 import { PropertyCard } from './components/property-card/PropertyCard';
 import { PropertyFilters } from './components/property-filters/PropertyFilters';
 import { Pagination } from './components/pagination/Pagination';
-import { createPageButtons } from './pageButtons';
 import styles from './ListingsPage.module.css';
 
 /**
@@ -15,10 +14,9 @@ export default function ListingsPage() {
     const [properties, setProperties] = useState([])
     const [totalProperties, setTotalProperties] = useState(0);
     const [submitted, setSubmitted] = useState(false);
-    const [filters, setFilters] = useState({beds: 8});
+    const [filters, setFilters] = useState({});
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(0);
-    const [pageButtons, setPageButtons] = useState([]);
 
     const filtersString = filtersToString(filters);
 
@@ -58,7 +56,7 @@ export default function ListingsPage() {
         if (currentPage > 0) {
             setSubmitted(true);
             setCurrentPage(prevPage);
-            setFilters({... filters, offset: (prevPage) * itemsPerPage})
+            setFilters({... filters, offset: (prevPage * itemsPerPage)})
         }
     }
 
@@ -70,14 +68,21 @@ export default function ListingsPage() {
         if (lastPropertyNum + 1 < totalProperties) {
             setSubmitted(true);
             setCurrentPage(nextPage);
-            setFilters({... filters, offset: (nextPage) * itemsPerPage})
+            setFilters({... filters, offset: (nextPage * itemsPerPage)})
        }
     }
 
-    // TODO: Fill in this function to move to a certain page 
-    // when a user clicks on a page number button.
+    // Handle moving to a specific page number.
     function handlePageClick(e) {
-        setSubmitted(true);
+        // Only move to the specified page if the user is not currently on it.
+        if (parseInt(e.target.value) !== currentPage + 1) {
+            setSubmitted(true);
+
+            const page = e.target.value - 1;
+            setCurrentPage(page);
+
+            setFilters({... filters, offset: (page * itemsPerPage)});
+        }
     }
 
     // Fetch default properties when first loading the page.
@@ -85,11 +90,10 @@ export default function ListingsPage() {
         const fetchDefaultProperties = async () => {
             try {
                 const response = await fetchProperties(filtersString);
-                const { updatedProperties, propertyData } = createPropertyCards(response, setProperties, setTotalProperties, setItemsPerPage, setPageButtons, currentPage);
+                const { updatedProperties, propertyData } = createPropertyCards(response);
                 setProperties(updatedProperties);
                 setTotalProperties(propertyData.total);
                 setItemsPerPage(updatedProperties.length); // Default items per page on the first load of the page.
-                setPageButtons(createPageButtons(currentPage, propertyData.total, updatedProperties.length, handlePageClick));
             }
             catch (error) {
                 setErrorMessage(error.message);
@@ -118,12 +122,7 @@ export default function ListingsPage() {
                     // Otherwise, use the default items per page that was set on the first load of the page.
                     if (filters?.limit) {
                         setItemsPerPage(filters.limit);
-                        setPageButtons(createPageButtons(currentPage, propertyData.total, filters.limit, handlePageClick));
                     }
-                    else {
-                        setPageButtons(createPageButtons(currentPage, propertyData.total, itemsPerPage, handlePageClick));
-                    }
-
                 }
             }
             catch (error) {
@@ -174,7 +173,7 @@ export default function ListingsPage() {
             <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
             <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
             <div className={styles.property_grid}>{properties}</div>
-            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties} pageButtons={pageButtons}/> 
+            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} onPageClick={handlePageClick} currentPage={currentPage} itemsPerPage={itemsPerPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties} /> 
         </>
     )    
 }

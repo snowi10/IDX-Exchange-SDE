@@ -1,7 +1,6 @@
-/* Start of Pagination component styling */
 .pagination_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    grid-template-columns: 25% 50% 25%;
     align-items:center;
     /*border: solid black 1px;*/
 }
@@ -46,5 +45,23 @@
     overflow: hidden;
 }
 
-/* Start of PageButton component styling */
+.page_button {
+    display: inline;
+    width: fit-content; 
+    color: black;
+    background-color: transparent;
+    border: none;
+    font-family: 'CharisSil';
+    overflow: hidden;
+}
 
+.page_button:hover {
+    display: inline;
+    width: fit-content; 
+    color: lightgrey;
+    background-color: transparent;
+    border: none;
+    font-family: 'CharisSil';
+    cursor: pointer;
+    overflow: hidden;
+}

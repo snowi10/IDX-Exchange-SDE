@@ -18,24 +18,3 @@ body {
     grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
     justify-content: center;
 }
-
-.page_button {
-    display: inline;
-    width: fit-content; 
-    color: black;
-    background-color: transparent;
-    border: none;
-    font-family: 'CharisSil';
-    overflow: hidden;
-}
-
-.page_button:hover {
-    display: inline;
-    width: fit-content; 
-    color: lightgray;
-    background-color: transparent;
-    border: none;
-    font-family: 'CharisSil';
-    cursor: pointer;
-    overflow: hidden;
-}
