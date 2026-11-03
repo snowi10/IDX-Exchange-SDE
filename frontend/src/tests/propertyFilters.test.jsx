@@ -1,6 +1,6 @@
 import { test, describe, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PropertyFilters } from '../listings-page/components/proprety-filters/PropertyFilters';
+import { PropertyFilters } from '../listings-page/components/property-filters/PropertyFilters';
 
 describe('PropertyFilters', () => {
     test('display filters from user input', async () => {
@@ -14,25 +14,27 @@ describe('PropertyFilters', () => {
     });
 
     test('filter button', () => {
-        const mockFiltering = () => render(<div>Filtered</div>);
+        const filteredText = 'Filtered';
+        const mockFiltering = () => render(<div>{filteredText}</div>);
 
         render(<PropertyFilters onSubmit={mockFiltering} />);
-        expect(screen.queryByText('Filtered')).not.toBeInTheDocument();
+        expect(screen.queryByText(filteredText)).not.toBeInTheDocument();
 
         const filterButton = screen.getByText('Filter');
         fireEvent.click(filterButton);
-        expect(screen.getByText('Filtered')).toBeInTheDocument();
+        expect(screen.getByText(filteredText)).toBeInTheDocument();
 
     });
 
     test('clear filters button', () => {
-        const mockClearingFilters = () => render(<div>Cleared</div>);
+        const clearedText = 'Cleared';
+        const mockClearingFilters = () => render(<div>{clearedText}</div>);
 
         render(<PropertyFilters onClearFilters={mockClearingFilters} />);
-        expect(screen.queryByText('Cleared')).not.toBeInTheDocument();
+        expect(screen.queryByText(clearedText)).not.toBeInTheDocument();
 
         const clearFiltersButton = screen.getByText('Clear filters');
         fireEvent.click(clearFiltersButton);
-        expect(screen.getByText('Cleared')).toBeInTheDocument();
+        expect(screen.getByText(clearedText)).toBeInTheDocument();
     });
 });
