@@ -54,10 +54,11 @@ function createPageButtons(currentPage, totalProperties, itemsPerPage, onPageCli
     const numOfPages = Math.ceil(totalProperties/itemsPerPage);
     const numOfDynamicPageButtons = 9;
     const dynamicPageButtonsOffset = Math.floor(numOfDynamicPageButtons/2);
+    const maxNumOfDynamicPageButtons = 6;
     let pageButtonsBuilder = []; 
 
     // Format page buttons for property listings with more than 6 pages.
-    if (numOfPages > 6) {
+    if (numOfPages > maxNumOfDynamicPageButtons) {
         const dynamicPageButtonsStart = calculateStartPageButton(currentPageNumber, numOfPages, numOfDynamicPageButtons, dynamicPageButtonsOffset);
         const dynamicPageButtonsEnd = calculateEndPageButton(currentPageNumber, numOfPages, numOfDynamicPageButtons, dynamicPageButtonsOffset);
 
