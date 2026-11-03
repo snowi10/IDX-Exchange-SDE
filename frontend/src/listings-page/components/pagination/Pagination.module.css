@@ -42,6 +42,7 @@
     border-radius: 15px;
     font-family: 'CharisSil';
     font-size: 01em;
+    cursor: not-allowed;
     overflow: hidden;
 }
 
