@@ -3,8 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Pagination } from '../listings-page/components/pagination/Pagination';
 
 describe('Pagination', () => {
-    // TODO: Fill in this test.
-    // TODO: Provide arguments for Pagination component for test to work.
     const mockCurrentPage = 30; 
     const mockItemsPerPage = 20;
     const mockFirstPropertyNum = (mockItemsPerPage * mockCurrentPage) + 1;
