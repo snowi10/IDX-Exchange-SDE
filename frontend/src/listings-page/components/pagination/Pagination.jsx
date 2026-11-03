@@ -52,7 +52,7 @@ export function Pagination({ onPrevClick, onNextClick, onPageClick, currentPage,
 function createPageButtons(currentPage, totalProperties, itemsPerPage, onPageClick) {
     const currentPageNumber = currentPage + 1;
     const numOfPages = Math.ceil(totalProperties/itemsPerPage);
-    const numOfDynamicPageButtons = 6;
+    const numOfDynamicPageButtons = 9;
     const dynamicPageButtonsOffset = Math.floor(numOfDynamicPageButtons/2);
     let pageButtonsBuilder = []; 
 
