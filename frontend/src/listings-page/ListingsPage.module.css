@@ -14,7 +14,7 @@ body {
 
 .property_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 25%));
+    grid-template-columns: repeat(auto-fit, min(300px));
     grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
     justify-content: center;
 }
