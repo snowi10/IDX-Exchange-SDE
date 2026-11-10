@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router';
 import { fetchProperties } from '../api/client';
 import { PropertyCard } from './components/property-card/PropertyCard';
 import { PropertyFilters } from './components/property-filters/PropertyFilters';
@@ -195,7 +194,7 @@ function createPropertyCards(propertyData) {
     for (let i = 0; i < propertyData.results.length; i++) {
         const result = propertyData.results[i];
         const id = result.L_ListingID;
-        const photo = result.L_Photos ? JSON.parse(result.L_Photos)[0] : 'Photo Unavailable';
+        const photos = result.L_Photos ? JSON.parse(result.L_Photos) : 'Photo Unavailable';
         const price = result.L_SystemPrice ? parseInt(result.L_SystemPrice) : 'N/A';
         const address = result.L_Address;
         const city = result.L_City;
@@ -205,8 +204,10 @@ function createPropertyCards(propertyData) {
         const baths = result.LM_Dec_3 ? parseInt(result.LM_Dec_3) : 'N/A';
         const sqft = result.LM_Int2_3 ? parseInt(result.LM_Int2_3) : 'N/A';
 
-        updatedProperties.push(<NavLink to={`/property/${id}`} key={id}><PropertyCard 
-            photo={photo} 
+        updatedProperties.push(<PropertyCard 
+            key={id}
+            id={id}
+            photos={photos} 
             price={price} 
             address={address} 
             city={city}
@@ -214,8 +215,7 @@ function createPropertyCards(propertyData) {
             state={state} 
             beds={beds} 
             baths={baths} 
-            sqft={sqft} />
-            </NavLink>)
+            sqft={sqft} />)
     }
 
     return { updatedProperties, propertyData };

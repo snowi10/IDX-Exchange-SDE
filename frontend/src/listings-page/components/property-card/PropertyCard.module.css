@@ -13,6 +13,7 @@
 }
 
 .image_container {
+    position: relative;
     display: block;
     height: 200px;
     overflow: hidden;
@@ -20,11 +21,45 @@
 }
 
 .image_container img {
+    position: relative;
     display: block;
     margin: auto;
     width: 100%;
     height: 100%;
+    z-index: 1;
     object-fit: cover;
+}
+
+.image_container button {
+    position: absolute;
+    object-fit: contain;
+    top: 50%;
+    height: 20%;
+    border: none;
+    border-radius: 100%;
+    opacity: 50%;
+}
+.image_container button:hover {
+    cursor: pointer;
+    opacity: 80%;
+}
+
+#next_button {
+    left: 85%;
+    z-index: 2;
+}
+
+#prev_button {
+    left: 0.8%;
+    z-index: 2;
+}
+
+#total_properties {
+    position: absolute;
+    right: 2%;
+    bottom: 75%;
+    z-index: 2;
+    object-fit: contain;
 }
 
 .description_container {

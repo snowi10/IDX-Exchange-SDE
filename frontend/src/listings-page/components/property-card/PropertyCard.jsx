@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { createFullAddress } from '../../../common/createFullAddress';
+import { NavLink } from 'react-router';
+import { createFullAddress } from '../../../common/createFullAddress.js';
+import { PropertyImageCarousel } from './PropertyImageCarousel';
 import photo_unavailable from '../../../assets/photo_unavailable.jpg';
 import loading_photo from '../../../assets/loading_photo.jpg';
 import styles from './PropertyCard.module.css';
@@ -15,33 +17,63 @@ import styles from './PropertyCard.module.css';
  * @param {number} beds - The number of beds that the property has.
  * @param {number} beds - The number of baths that the property has.
  */
-export function PropertyCard({ photo, price, address, zip, city, state, beds, baths, sqft }) {
+export function PropertyCard({ id, photos, price, address, zip, city, state, beds, baths, sqft }) {
     const [photoIsLoading, setPhotoIsLoading] = useState(true);
+    const [currentPhoto, setCurrentPhoto] = useState(0);
 
     const fullAddress = createFullAddress(address, city, state, zip);
 
+    function handlePrevPhotoClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (photos !== 'Photo Unavailable') {
+            if (currentPhoto > 0) {
+                setCurrentPhoto(currentPhoto - 1);
+                setPhotoIsLoading(true);
+            }
+            else {
+                setCurrentPhoto(photos.length - 1);
+                setPhotoIsLoading(true);
+            }
+        }
+    }
+
+    function handleNextPhotoClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (photos !== 'Photo Unavailable') {
+            if (currentPhoto < photos.length - 1) {
+                setCurrentPhoto(currentPhoto + 1);
+                setPhotoIsLoading(true);
+            }
+            else {
+                setCurrentPhoto(0);
+                setPhotoIsLoading(true);
+            }
+        }
+    }
+
     // Replace properties with no photos.
-    const displayPhoto = photo === 'Photo Unavailable' ? photo_unavailable : photo;
+    let displayPhoto = photos === 'Photo Unavailable' ? photo_unavailable : photos[currentPhoto];
 
     // Set placeholder cards for photos that are still loading.
     const actual = photoIsLoading ? {display: "none"} : {display : "block"};
     const placeholder = photoIsLoading ? {display: "block"} : {display: "none"};
 
-    // TODO: Handle empty strings in the description container.
     // TODO: Add commas to prices.
     return (
+        <NavLink to={`/property/${id}`}>
         <div className={styles.property_card}>
-            <div className={styles.image_container} style={actual}>
-                <img src={displayPhoto} onLoad={() => setPhotoIsLoading(false)}></img>
-            </div>   
-            <div className={styles.image_container} style={placeholder}>
-                <img src={loading_photo}></img>
-            </div>
+            <PropertyImageCarousel style={actual} photo={displayPhoto} currentPhoto={photos === 'Photo Unavailable' ? 0 : currentPhoto + 1} totalPhotos={photos === 'Photo Unavailable' ? 0 : photos.length} setPhotoIsLoading={setPhotoIsLoading} onPrevPhotoClick={handlePrevPhotoClick} onNextPhotoClick={handleNextPhotoClick}/> 
+            <PropertyImageCarousel style={placeholder} photo={loading_photo} currentPhoto={photos === 'Photo Unavailable' ? 0 : currentPhoto + 1} totalPhotos={photos === 'Photo Unavailable' ? 0 : photos.length} onPrevPhotoClick={handlePrevPhotoClick} onNextPhotoClick={handleNextPhotoClick} />
             <div className={styles.description_container}>
                 <p id={styles.price}>${price}</p>
                 <p><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Sqft</b>: {sqft}</p>
                 <p id={styles.address}>{fullAddress}</p>
             </div>
         </div>
+        </NavLink>
     )
 }
