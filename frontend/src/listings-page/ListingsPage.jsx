@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router';
 import { fetchProperties } from '../api/client';
 import { PropertyCard } from './components/property-card/PropertyCard';
 import { PropertyFilters } from './components/property-filters/PropertyFilters';
@@ -83,6 +84,10 @@ export default function ListingsPage() {
 
             setFilters({... filters, offset: (page * itemsPerPage)});
         }
+    }
+
+    function handlePropertyClick(id) {
+        propertyNavigate(`/property/${id}`);
     }
 
     // Fetch default properties when first loading the page.
@@ -189,6 +194,7 @@ function createPropertyCards(propertyData) {
     // Create PropertyCard components for each property.
     for (let i = 0; i < propertyData.results.length; i++) {
         const result = propertyData.results[i];
+        const id = result.L_ListingID;
         const photo = result.L_Photos ? JSON.parse(result.L_Photos)[0] : 'Photo Unavailable';
         const price = result.L_SystemPrice ? parseInt(result.L_SystemPrice) : 'N/A';
         const address = result.L_Address;
@@ -199,8 +205,7 @@ function createPropertyCards(propertyData) {
         const baths = result.LM_Dec_3 ? parseInt(result.LM_Dec_3) : 'N/A';
         const sqft = result.LM_Int2_3 ? parseInt(result.LM_Int2_3) : 'N/A';
 
-        updatedProperties.push(<PropertyCard 
-            key={i} 
+        updatedProperties.push(<NavLink to={`/property/${id}`} key={id}><PropertyCard 
             photo={photo} 
             price={price} 
             address={address} 
@@ -209,7 +214,8 @@ function createPropertyCards(propertyData) {
             state={state} 
             beds={beds} 
             baths={baths} 
-            sqft={sqft}/>)
+            sqft={sqft} />
+            </NavLink>)
     }
 
     return { updatedProperties, propertyData };

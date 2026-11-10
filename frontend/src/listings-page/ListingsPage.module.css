@@ -8,6 +8,11 @@ body {
     font-family: 'CharisSIL';
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 #showing {
     text-align: right;
 }
