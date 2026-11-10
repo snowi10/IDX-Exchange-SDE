@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createFullAddress } from '../../../common/createFullAddress';
 import photo_unavailable from '../../../assets/photo_unavailable.jpg';
 import loading_photo from '../../../assets/loading_photo.jpg';
 import styles from './PropertyCard.module.css';
@@ -29,7 +30,7 @@ export function PropertyCard({ photo, price, address, zip, city, state, beds, ba
     // TODO: Handle empty strings in the description container.
     // TODO: Add commas to prices.
     return (
-        <div className={styles.property_card} >
+        <div className={styles.property_card}>
             <div className={styles.image_container} style={actual}>
                 <img src={displayPhoto} onLoad={() => setPhotoIsLoading(false)}></img>
             </div>   
@@ -43,54 +44,4 @@ export function PropertyCard({ photo, price, address, zip, city, state, beds, ba
             </div>
         </div>
     )
-}
-
-/**
- * Create the full address of a property based on the address, city, state, and zip code.
- * @param {string} address - The address of the property. 
- * @param {string} city  - The city of the property.
- * @param {string} state - The state of the property.
- * @param {string} zip - The zip code of the property. 
- * @returns a string of the full address of a property.
- */
-function createFullAddress(address, city, state, zip) {
-    let fullAddressBuilder = [];
-
-    // Address.
-    if (address) {
-        fullAddressBuilder.push(address);
-    }
-
-    // City.
-    if (city && address) {
-        fullAddressBuilder.push(`, ${city}`);
-    }
-    else if (city) {
-        fullAddressBuilder.push(city);
-    }
-
-    // State.
-    if (state && (address || city)) {
-        fullAddressBuilder.push(`, ${state}`);
-    }
-    else if (state) {
-        fullAddressBuilder.push(state);
-    }
-
-    // Zip code.
-    if (zip && parseInt(zip) !== 0) {
-        if (state) {
-            fullAddressBuilder.push(` ${zip}`);
-        }
-        else if (address || city) {
-            fullAddressBuilder.push(`, ${zip}`);
-        }
-        else  {
-            fullAddressBuilder.push(zip);
-        }
-    }
-
-    const fullAddress = fullAddressBuilder? fullAddressBuilder.join('') : ''; 
-
-    return fullAddress;
 }
