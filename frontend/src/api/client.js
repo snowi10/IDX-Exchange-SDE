@@ -4,18 +4,19 @@ export async function fetchProperties(params) {
 
         // Handle responses with an error.
         if (response.status !== 200) {
-            throw new Error(`Failed to fetch properties. \nStatus: ${response.status}.`)
+            throw new Error(`Failed to fetch properties. \nStatus: ${response.status}.`);
         }
 
         return await response.json(); 
 }
 
-/*
 // Fetch property by ID.
 export async function fetchPropertyDetail(id) {
-    const property = await fetch(`/api/properties/${id}`);
+    const response = await fetch(`/api/properties/${id}`);
 
+    if (response.status !== 200) {
+        throw new Error(`Failed to fetch property deatil. \nStatus: ${response.status}.`);
+    }
 
-    return property;
+    return await response.json();
 }
-*/
