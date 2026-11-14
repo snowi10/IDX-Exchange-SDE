@@ -6,8 +6,7 @@ const app = express();
 
 // Cross-origin connection.
 const corsOptions = {
-    origin: `${process.env.CROSS_ORIGIN}`,
-    methods: 'GET'
+    origin: [`${process.env.CROSS_ORIGIN_DATABASE}`, `${process.env.CROSS_ORIGIN_FRONTEND}`]
 };
 
 app.use(cors(corsOptions));
