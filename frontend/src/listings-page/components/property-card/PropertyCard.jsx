@@ -27,15 +27,19 @@ export function PropertyCard({ id, photos, price, address, zip, city, state, bed
         e.preventDefault();
         e.stopPropagation();
 
-        if (photos !== 'Photo Unavailable') {
-            if (currentPhoto > 0) {
-                setCurrentPhoto(currentPhoto - 1);
-                setPhotoIsLoading(true);
-            }
-            else {
-                setCurrentPhoto(photos.length - 1);
-                setPhotoIsLoading(true);
-            }
+        if (photos === 'Photo Unavailable') {
+            return;
+        }
+        if (photos.length <= 1) {
+            return;
+        }
+        if (currentPhoto > 0) {
+            setCurrentPhoto(currentPhoto - 1);
+            setPhotoIsLoading(true);
+        }
+        else {
+            setCurrentPhoto(photos.length - 1);
+            setPhotoIsLoading(true);
         }
     }
 
@@ -43,15 +47,19 @@ export function PropertyCard({ id, photos, price, address, zip, city, state, bed
         e.preventDefault();
         e.stopPropagation();
 
-        if (photos !== 'Photo Unavailable') {
-            if (currentPhoto < photos.length - 1) {
-                setCurrentPhoto(currentPhoto + 1);
-                setPhotoIsLoading(true);
-            }
-            else {
-                setCurrentPhoto(0);
-                setPhotoIsLoading(true);
-            }
+        if (photos === 'Photo Unavailable') {
+            return;
+        }
+        if (photos.length <= 1) {
+            return;
+        }
+        if (currentPhoto < photos.length - 1) {
+            setCurrentPhoto(currentPhoto + 1);
+            setPhotoIsLoading(true);
+        }
+        else {
+            setCurrentPhoto(0);
+            setPhotoIsLoading(true);
         }
     }
 
