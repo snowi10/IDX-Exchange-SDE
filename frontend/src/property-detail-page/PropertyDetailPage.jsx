@@ -1,15 +1,23 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { fetchPropertyDetail } from '../api/client';
-import { createFullAddress } from '../common/createFullAddress';
+import { createFullAddress } from '../common/createFullAddress.js';
+import { PropertyImageGallery } from './components/PropertyImageGallery.jsx';
+import styles from './PropertyDetailPage.module.css';
 
+// TODO: Add more descriptions to the page.
+// TODO: Display open house information.
+// TODO: Add Google maps location.
+// TODO: Create lightbox.
 export default function PropertyDetailPage({ }) {
     const [propDetail, setPropDetail] = useState({})
+    const [photoGallery, setPhotoGallery] = useState([]);
     const { id } = useParams();
 
     useEffect(() => {
         const fetchPropDetail = async () => {
             const detail = await fetchPropertyDetail(id);
+            const photos = detail.L_Photos ? JSON.parse(detail.L_Photos) : 'Photo Unavailable';
             const price = detail.L_SystemPrice ? parseInt(detail.L_SystemPrice) : 'N/A';
             const address = detail.L_Address;
             const city = detail.L_City;
@@ -32,19 +40,19 @@ export default function PropertyDetailPage({ }) {
                 year: year,
                 description: description,
                 json: JSON.stringify(detail)});
+            
+            setPhotoGallery(photos === 'Photo Unavailable' ? [] : photos);
         }
 
         fetchPropDetail();
 
-    }, [])
+    }, []);
 
-
-    return (<>
-        <p>${propDetail.price}</p>
-        <p>{propDetail.address}</p>
-        <p>Beds: {propDetail.beds}</p>
-        <p>Baths: {propDetail.baths}</p>
-        <p>Sqft: {propDetail.sqft}</p>
+    return (
+    <>
+        <PropertyImageGallery photos={photoGallery} />
+        <p id={styles.main}><b>${propDetail.price}</b> | Beds: {propDetail.beds} | Baths: {propDetail.baths} | Sqft: {propDetail.sqft}</p>
+        <p id={styles.address}>{propDetail.address}</p>
         <p>Year built: {propDetail.year}</p>
         <p>{propDetail.description}</p>
     </>);
