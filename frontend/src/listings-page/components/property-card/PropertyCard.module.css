@@ -14,8 +14,8 @@
 }
 
 .image_container {
-    position: relative;
     display: block;
+    position: relative;
     height: 200px;
     overflow: hidden;
     object-fit: contain;
@@ -77,10 +77,11 @@
 #total_properties {
     position: absolute;
     right: 0%;
-    bottom: 75%;
+    bottom: 70%;
     background-color: white;
-    opacity: 70%;
+    opacity: 60%;
     padding: 5px;
+    font-size: 15px;
     font-weight: bold;
     z-index: 2;
     object-fit: contain;
