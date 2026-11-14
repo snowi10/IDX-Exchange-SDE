@@ -85,10 +85,6 @@ export default function ListingsPage() {
         }
     }
 
-    function handlePropertyClick(id) {
-        propertyNavigate(`/property/${id}`);
-    }
-
     // Fetch default properties when first loading the page.
     useEffect(() => {
         const fetchDefaultProperties = async () => {
