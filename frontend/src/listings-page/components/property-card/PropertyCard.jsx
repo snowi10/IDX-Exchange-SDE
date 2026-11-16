@@ -7,7 +7,7 @@ import loading_photo from '../../../assets/loading_photo.jpg';
 import styles from './PropertyCard.module.css';
 
 /**
- * The component to display a property. 
+ * The component to display individual properties on a card. 
  * @param {string} photo - The first photo URL of the property.
  * @param {number} price - The listing price of the property.
  * @param {string} address - The address line of the property.
