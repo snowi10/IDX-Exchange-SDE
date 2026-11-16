@@ -33,8 +33,7 @@ export default function ListingsPage() {
         setCurrentPage(0);
     }
     
-    // TODO: Create function for not letting minPrice be greater than maxPrice
-    // and maxPrice be less than minPrice.
+    // TODO: Create function for not letting minPrice be greater than maxPrice and maxPrice be less than minPrice.
     // Handle changing filters in the PropertyFilters component.
     function handleFilterChange(e) {
         setSubmitted(false);
@@ -159,22 +158,22 @@ export default function ListingsPage() {
     // UI for no properties found.
     if (totalProperties === 0) {
         return (
-            <>
+            <div id={styles.properties_body}>
                 <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
                 <div id={styles.showing}>Showing {totalProperties} out of {totalProperties} properties</div>
                 <div>No properties found.</div>
-            </>
+            </div>
         )
     }
     
     // UI for properties list.
     return (
-        <>
+        <div id={styles.properties_body}>
             <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
             <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
             <div className={styles.property_grid}>{properties}</div>
             <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} onPageClick={handlePageClick} currentPage={currentPage} itemsPerPage={itemsPerPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties} /> 
-        </>
+        </div>
     )    
 }
 
