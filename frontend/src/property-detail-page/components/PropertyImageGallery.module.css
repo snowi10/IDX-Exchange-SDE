@@ -1,3 +1,7 @@
+#gallery_body {
+    margin: 15px;
+}
+
 .photo_gallery {
     display: grid;
     position: relative;
@@ -10,25 +14,151 @@
     border-radius: 30px;
 }
 
+.photo_gallery img:hover {
+    cursor: pointer;
+    filter: brightness(50%);
+}
+
+.photo_gallery_disabled {
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-rows: repeat(auto-fit, max(500px));
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    overflow: hidden;
+    border-radius: 30px;
+}
 .main_photo {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-#photo_strip {
+#gallery_strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(35%, 1fr));
     width: 100%;
     gap: 10px;
 }
 
-#photo_strip div {
+#gallery_strip div {
     overflow: hidden;
 }
 
-#photo_strip div img {
+#gallery_strip div img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+#lightbox {
+    display: grid;
+    position: fixed;
+    grid-template-rows: 70% 23%;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#lightbox img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#current_photo img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#lightbox_strip {
+    display: flex;
+    position: relative;
+    margin-top: 2%;
+    width: 100%;
+    height: 100%;
+}
+
+.strip_column {
+    display: flex;
+    position: relative;
+    padding: 5px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.strip_column img {
+    display: block;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.strip_column img:hover {
+    cursor: pointer;
+}
+
+#lightbox button {
+    position: absolute;
+    object-fit: contain;
+    top: 30%;
+    width: 5%;
+    height: 10%;
+    font-size: 30px;
+    font-weight: bold;
+    border: none;
+    border-radius: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+#lightbox button:hover {
+    opacity: 50%;
+    z-index: 2;
+}
+
+#prev_button {
+    left: 0%;
+}
+
+#prev_button:hover {
+    cursor: pointer;
+}
+
+#prev_button_disabled {
+    opacity: 50%;
+    left: 0%;
+}
+
+#prev_button_disabled:hover {
+    cursor: not-allowed;
+}
+
+#next_button {
+    right: 0%;
+}
+
+#next_button:hover {
+    cursor: pointer;
+}
+
+#next_button_disabled {
+    opacity: 50%;
+    right: 0%;
+}
+
+#next_button_disabled:hover {
+    cursor: not-allowed;
 }
