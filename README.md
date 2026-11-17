@@ -1,7 +1,12 @@
 # IDX-Exchange-SDE
 A mock real estate marketplace website for an internship project at IDX Exchange.
-## Progress
-- Retrieves property details from the backend.
-- Displays properties in the frontend.
-- Users are able to filter properties.
-- **Current:** Working on implementing functionality for moving through the next and previous pages (pagination) in the frontend.
+## Current Features
+- Backend for communicating with MySQL database to retrieve property details.
+- Frontend to display properties with a user-friendly interface.
+- Filters for sifting through properties.
+- Pagination for moving through pages of properties.
+- Navigation to property detail page.
+- Lightbox to show property photos.
+- Google maps embedded API to show location of property.
+## WIP 
+- Sorting properties by price, date listed, square footage, or beds. 
