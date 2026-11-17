@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { fetchProperties } from '../api/client';
 import { PropertyCard } from './components/property-card/PropertyCard';
 import { PropertyFilters } from './components/property-filters/PropertyFilters';
 import { Pagination } from './components/pagination/Pagination';
+import { errorBoundaryMessage } from '../common/errorBoundaryMessage';
 import styles from './ListingsPage.module.css';
 
 /**
@@ -17,6 +19,7 @@ export default function ListingsPage() {
     const [filters, setFilters] = useState({});
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(0);
+    const [showOrderBy, setShowOrderBy] = useState(false);
 
     const filtersString = filtersToString(filters);
 
@@ -38,12 +41,14 @@ export default function ListingsPage() {
     function handleFilterChange(e) {
         setSubmitted(false);
         setFilters({... filters, [e.target.name]: e.target.value});
+        console.log(filters);
     }
 
     // Handle clearing filters in the PropertyFilters component.
     function handleClearFilters() {
         setSubmitted(true);
         setFilters({});
+        setShowOrderBy(false);
         setCurrentPage(0);
     }
 
@@ -56,6 +61,18 @@ export default function ListingsPage() {
             setSubmitted(true);
             setCurrentPage(prevPage);
             setFilters({... filters, offset: (prevPage * itemsPerPage)})
+        }
+    }
+
+    function handleOnSortByChange(e) {
+        if (e.target.value === '') {
+            delete filters?.orderBy;
+            handleFilterChange(e);
+            setShowOrderBy(false);
+        }
+        else {
+            handleFilterChange(e);
+            setShowOrderBy(true);
         }
     }
 
@@ -141,40 +158,50 @@ export default function ListingsPage() {
     // TODO: Create better UI for error message.
     // UI for error messages.
     if (errorMessage) {
-        return <div>{errorMessage}</div>
+        return (
+            <div id={styles.properties_body}>
+                <div>{errorMessage}</div>
+            </div>
+        );
     }
 
     // TODO: Create better UI for loading screen.
     // UI for API call that is still loading. 
     if (loading) {
         return (
-            <>
-                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
-                <div>Loading...</div>
-            </>
-        )
+            <ErrorBoundary fallback={errorBoundaryMessage()}>
+                <div id={styles.properties_body}>
+                    <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters} onSortByChange={handleOnSortByChange} showOrderBy={showOrderBy} />
+                    <div>Loading...</div>
+                </div>
+            </ErrorBoundary>
+        );
     }
 
     // UI for no properties found.
     if (totalProperties === 0) {
         return (
-            <div id={styles.properties_body}>
-                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
-                <div id={styles.showing}>Showing {totalProperties} out of {totalProperties} properties</div>
-                <div>No properties found.</div>
-            </div>
-        )
+            <ErrorBoundary fallback={errorBoundaryMessage()}>
+                <div id={styles.properties_body}>
+                    <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters} onSortByChange={handleOnSortByChange} showOrderBy={showOrderBy} />
+                    <div id={styles.showing}>Showing {totalProperties} out of {totalProperties} properties</div>
+                    <div>No properties found.</div>
+                </div>
+            </ErrorBoundary>
+        );
     }
     
     // UI for properties list.
     return (
-        <div id={styles.properties_body}>
-            <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters}/>
-            <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
-            <div className={styles.property_grid}>{properties}</div>
-            <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} onPageClick={handlePageClick} currentPage={currentPage} itemsPerPage={itemsPerPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties} /> 
-        </div>
-    )    
+        <ErrorBoundary fallback={errorBoundaryMessage()}>
+            <div id={styles.properties_body}>
+                <PropertyFilters onSubmit={handleOnSubmit} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} filters={filters} onSortByChange={handleOnSortByChange} showOrderBy={showOrderBy} />
+                <div id={styles.showing}>Showing {firstPropertyNum}-{lastPropertyNum} out of {totalProperties} properties</div>
+                <div className={styles.property_grid}>{properties}</div>
+                <Pagination onPrevClick={handlePrevClick} onNextClick={handleNextClick} onPageClick={handlePageClick} currentPage={currentPage} itemsPerPage={itemsPerPage} firstPropertyNum={firstPropertyNum} lastPropertyNum={lastPropertyNum} totalProperties={totalProperties} /> 
+            </div>
+        </ErrorBoundary>
+    );    
 }
 
 /**

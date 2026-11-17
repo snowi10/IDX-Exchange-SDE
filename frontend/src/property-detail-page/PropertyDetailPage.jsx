@@ -1,19 +1,28 @@
-import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 import { useEffect, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { fetchPropertyDetail, fetchOpenhouseDetail } from '../api/client';
 import { createFullAddress } from '../common/createFullAddress.js';
 import { PropertyImageGallery } from './components/property-image-gallery/PropertyImageGallery.jsx';
 import { Openhouse } from './components/openhouse/Openhouse.jsx';
 import { PropertyMap } from './components/property-map/PropertyMap.jsx';
+import { errorBoundaryMessage } from '../common/errorBoundaryMessage.jsx';
 import styles from './PropertyDetailPage.module.css';
 
 // TODO: Add more descriptions to the page.
+// TODO: Parse time of openhouse information.
+// TODO: Have 'show more' button for long sections.
 // TODO: Fix empty strings for openhouse information.
-export default function PropertyDetailPage({ }) {
+export default function PropertyDetailPage() {
     const [propDetail, setPropDetail] = useState({})
     const [photoGallery, setPhotoGallery] = useState([]);
     const [openhouseDetails, setOpenhouseDetails] = useState([]);
     const { id } = useParams();
+    const thisPath = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [thisPath]);
 
     useEffect(() => {
         const fetchPropDetail = async () => {
@@ -91,11 +100,8 @@ export default function PropertyDetailPage({ }) {
         getOpenhouseDetail();
     }, []);
 
-    console.log(`${propDetail.latitude}\n`);
-    console.log(`${propDetail.longitude}`);
-
     return (
-    <>
+    <ErrorBoundary fallback={errorBoundaryMessage()}>
         <PropertyImageGallery photos={photoGallery} />
         <div id={styles.detail_body}>
             <div>
@@ -111,5 +117,5 @@ export default function PropertyDetailPage({ }) {
             <hr></hr>
             <PropertyMap latitude={propDetail.latitude} longitude={propDetail.longitude} />
         </div>
-    </>);
+    </ErrorBoundary>);
 }
