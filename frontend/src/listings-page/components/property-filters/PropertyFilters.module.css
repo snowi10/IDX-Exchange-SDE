@@ -9,7 +9,7 @@
 
 .filter_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
     grid-auto-rows: 1fr;
  
 }
@@ -34,11 +34,22 @@
 
 .bed_baths_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(50%, 1fr));
 }
 
 .bed_baths_grid select {
-    width: 50%;
+    width: 60%;
+}
+
+.sort_grid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(50%, 50%));
+}
+
+.sort_grid select {
+    width: 90%;
 }
 
 .filter_button {

@@ -53,10 +53,13 @@ prop_router.get('', async (req, res) => {
         // Get filters from the request.
         let queryConditions = '';
         let queryParams = []; 
+        let orderConditions = '';
         try{
             const { conditionsString, params } = buildQuery(req.query);
             queryConditions = conditionsString;
             queryParams = params;
+
+            orderConditions = buildSort(req.query);
         }
         catch (error) {
             // Return status '400' for invalid filters.
@@ -74,7 +77,9 @@ prop_router.get('', async (req, res) => {
         const countQuery = `SELECT COUNT(*) AS total FROM rets.rets_property ${queryConditions}`;
 
         // Query statement with conditions for data results.
-        const dataQuery = `SELECT * FROM rets.rets_property ${queryConditions} LIMIT ? OFFSET ?`;
+        const dataQuery = `SELECT * FROM rets.rets_property ${queryConditions} ${orderConditions} LIMIT ? OFFSET ?`;
+
+        console.log(dataQuery);
 
         // Execute queries with parameters.
         const [count] = await pool.query(countQuery, [...queryParams]);
@@ -296,6 +301,59 @@ function buildQuery(filters) {
     const conditionsString = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     return { conditionsString, params };
+}
+
+function buildSort(filters) {
+    let orderParams = [];
+
+    if (filters.orderBy && !filters.sortBy) {
+        throw new Error('Cannot order without a sort option.');
+    }
+
+    if (filters.sortBy) {
+        switch (filters.sortBy) {
+            case 'price':
+                orderParams.push('L_SystemPrice');
+            break;
+
+            case 'date':
+                orderParams.push('ListingContractDate');
+            break;
+
+            case 'squareFeet':
+                orderParams.push('LM_Int2_3');
+            break;
+
+            case 'beds':
+                orderParams.push('L_Keyword2');
+            break;
+
+            default:
+                throw new Error('Invalid sort option.');
+        } 
+
+        if (filters.orderBy) {
+            switch (filters.orderBy) {
+                case 'ascending':
+                    orderParams.push('ASC');
+                break;
+
+                case 'descending':
+                    orderParams.push('DESC');
+                break;
+
+                default:
+                    throw new Error('Invalid order option.');
+            }
+        }
+        else {
+            orderParams.push('ASC');
+        }
+    }
+
+    let orderConditionsString = orderParams.length !== 0 ? `ORDER BY ${orderParams.join(' ')}` : '';
+
+    return orderConditionsString;
 }
    
 module.exports = prop_router;
