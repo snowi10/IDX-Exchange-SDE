@@ -1,12 +1,11 @@
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
-import dotenv from 'dotenv'
 import { defineConfig } from 'vite'
 
-dotenv.config();
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {'process.env': process.env},
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })
