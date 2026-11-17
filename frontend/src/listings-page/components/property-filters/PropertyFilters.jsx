@@ -41,7 +41,7 @@ export function PropertyFilters({ onSubmit, onFilterChange, onClearFilters, onSo
                     <div className={styles.bed_baths_grid}>
                         <div>
                             <label htmlFor="beds">Beds</label><br></br>            
-                            <select name="beds" id={styles.beds} className={styles.filter_input} value={filters?.beds || ''} onChange={(e) => onSortByChange(e)}>
+                            <select name="beds" id={styles.beds} className={styles.filter_input} value={filters?.beds || ''} onChange={(e) => onFilterChange(e)}>
                                 <option value=""></option>
                                 <option value="0">0</option>
                                 <option value="1">1</option>
