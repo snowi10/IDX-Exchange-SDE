@@ -39,17 +39,21 @@ export default function ListingsPage() {
     // TODO: Create function for not letting minPrice be greater than maxPrice and maxPrice be less than minPrice.
     // Handle changing filters in the PropertyFilters component.
     function handleFilterChange(e) {
-        setSubmitted(false);
-        setFilters({... filters, [e.target.name]: e.target.value});
-        console.log(filters);
+        if (!loading) {
+            setSubmitted(false);
+            setFilters({... filters, [e.target.name]: e.target.value});
+            console.log(filters);
+        }
     }
 
     // Handle clearing filters in the PropertyFilters component.
     function handleClearFilters() {
-        setSubmitted(true);
-        setFilters({});
-        setShowOrderBy(false);
-        setCurrentPage(0);
+        if (!loading) {
+            setSubmitted(true);
+            setFilters({});
+            setShowOrderBy(false);
+            setCurrentPage(0);
+        }
     }
 
     // Handle moving to the previous page.
@@ -65,14 +69,16 @@ export default function ListingsPage() {
     }
 
     function handleOnSortByChange(e) {
-        if (e.target.value === '') {
-            delete filters?.orderBy;
-            handleFilterChange(e);
-            setShowOrderBy(false);
-        }
-        else {
-            handleFilterChange(e);
-            setShowOrderBy(true);
+        if (!loading) {
+            if (e.target.value === '') {
+                delete filters?.orderBy;
+                handleFilterChange(e);
+                setShowOrderBy(false);
+            }
+            else {
+                handleFilterChange(e);
+                setShowOrderBy(true);
+            }
         }
     }
 
