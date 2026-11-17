@@ -1,17 +1,18 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
-import { fetchPropertyDetail } from '../api/client';
+import { fetchPropertyDetail, fetchOpenhouseDetail } from '../api/client';
 import { createFullAddress } from '../common/createFullAddress.js';
-import { PropertyImageGallery } from './components/PropertyImageGallery.jsx';
+import { PropertyImageGallery } from './components/property-image-gallery/PropertyImageGallery.jsx';
+import { Openhouse } from './components/openhouse/Openhouse.jsx';
+import { PropertyMap } from './components/property-map/PropertyMap.jsx';
 import styles from './PropertyDetailPage.module.css';
 
 // TODO: Add more descriptions to the page.
-// TODO: Display open house information.
-// TODO: Add Google maps location.
-// TODO: Create lightbox.
+// TODO: Fix empty strings for openhouse information.
 export default function PropertyDetailPage({ }) {
     const [propDetail, setPropDetail] = useState({})
     const [photoGallery, setPhotoGallery] = useState([]);
+    const [openhouseDetails, setOpenhouseDetails] = useState([]);
     const { id } = useParams();
 
     useEffect(() => {
@@ -28,6 +29,8 @@ export default function PropertyDetailPage({ }) {
             const sqft = detail.LM_Int2_3 ? parseInt(detail.LM_Int2_3) : 'N/A';
             const year = detail.YearBuilt ? detail.YearBuilt : 'N/A';
             const description = detail.L_Remarks;
+            const latitude = detail.LMD_MP_Latitude;
+            const longitude = detail.LMD_MP_Longitude;
 
             const fullAddress = createFullAddress(address, city, state, zip);
 
@@ -39,6 +42,8 @@ export default function PropertyDetailPage({ }) {
                 sqft: sqft, 
                 year: year,
                 description: description,
+                latitude: latitude,
+                longitude: longitude,
                 json: JSON.stringify(detail)});
             
             setPhotoGallery(photos === 'Photo Unavailable' ? [] : photos);
@@ -48,12 +53,63 @@ export default function PropertyDetailPage({ }) {
 
     }, []);
 
+
+    useEffect(() => {
+        const getOpenhouseDetail = async () => {
+            const detail = await fetchOpenhouseDetail(id);
+            let currOpenhouse = {};
+
+            if (detail.lenth === 0) {
+                currOpenhouse = {isInfo: false};
+            }
+            else {
+
+                for (let i = 0; i < detail.length; i++) {
+                    const status = detail[i].OpenHouseStatus;
+                    const type = detail[i].OpenHouseType;
+                    const startTime = detail[i].OpenHouseStartTime;
+                    const endTime = detail[i].OpenHouseEndTime;
+                    const date = detail[i].OpenHouseDate;
+                    const agentFirstName = detail[i].ShowingAgentFirstName;
+                    const agentLastName = detail[i].ShowingAgentLastName;
+                    currOpenhouse = {
+                        isInfo: true,
+                        status: status, 
+                        type: type, 
+                        startTime: startTime, 
+                        endTime: endTime,
+                        date: date,
+                        agentFirstName: agentFirstName,
+                        agentLastName: agentLastName
+                    }
+                }
+
+                setOpenhouseDetails(...openhouseDetails, <Openhouse details={currOpenhouse}></Openhouse>);
+            }
+        }
+
+        getOpenhouseDetail();
+    }, []);
+
+    console.log(`${propDetail.latitude}\n`);
+    console.log(`${propDetail.longitude}`);
+
     return (
     <>
         <PropertyImageGallery photos={photoGallery} />
-        <p id={styles.main}><b>${propDetail.price}</b> | Beds: {propDetail.beds} | Baths: {propDetail.baths} | Sqft: {propDetail.sqft}</p>
-        <p id={styles.address}>{propDetail.address}</p>
-        <p>Year built: {propDetail.year}</p>
-        <p>{propDetail.description}</p>
+        <div id={styles.detail_body}>
+            <div>
+                <h1 id={styles.main}><b>${propDetail.price}</b> | <b>Beds:</b> {propDetail.beds} | <b>Baths:</b> {propDetail.baths} | <b>Sqft:</b> {propDetail.sqft}<br></br></h1>
+                <h2 id={styles.address}>{propDetail.address}</h2>
+                <h3><b>Features:</b></h3>
+                <p>Year built: {propDetail.year}</p>
+                <h3><b>Description:</b><br></br></h3>
+                <p>{propDetail.description}</p>
+            </div>
+            <hr></hr>
+            {openhouseDetails}
+            <hr></hr>
+            <PropertyMap latitude={propDetail.latitude} longitude={propDetail.longitude} />
+        </div>
     </>);
 }

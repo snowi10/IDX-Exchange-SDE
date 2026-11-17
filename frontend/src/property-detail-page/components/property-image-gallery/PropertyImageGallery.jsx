@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Lightbox } from './Lightbox';
-import photo_unavailable from '../../assets/photo_unavailable2.jpg';
-import loading from '../../assets/loading_photo.jpg';
+import { Lightbox } from '../lightbox/Lightbox';
+import photo_unavailable from '../../../assets/photo_unavailable2.jpg';
+import loading from '../../../assets/loading_photo.jpg';
 import styles from './PropertyImageGallery.module.css';
 
 /**

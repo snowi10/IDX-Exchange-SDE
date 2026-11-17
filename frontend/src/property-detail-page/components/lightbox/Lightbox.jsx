@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import styles from './PropertyImageGallery.module.css';
-import loading_photo from '../../assets/loading_photo.jpg'; 
+import styles from './Lightbox.module.css';
+import loading_photo from '../../../assets/loading_photo.jpg'; 
 
 export function Lightbox({ photos, display, currentPhoto, maxStripPhotos, startStripPhoto, handleOnPrevClick, handleOnNextClick, handleOnBackgrounClick, handleOnPhotoClick }) {
     const [photoIsLoading, setPhotoIsLoading] = useState(new Array(photos.length).fill(true));
