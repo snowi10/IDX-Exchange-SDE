@@ -20,3 +20,14 @@ export async function fetchPropertyDetail(id) {
 
     return await response.json();
 }
+
+// Fetch openhouse of a property by ID.
+export async function fetchOpenhouseDetail(id) {
+    const response = await fetch(`/api/properties/${id}/openhouse`);
+
+    if (response.status !== 200) {
+        throw new Error(`Failed to fetch openhouse detail. \nStatus: ${response.status}.`);
+    }
+
+    return await response.json();
+}
