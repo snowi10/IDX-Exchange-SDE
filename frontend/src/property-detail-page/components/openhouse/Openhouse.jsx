@@ -15,6 +15,6 @@ export function Openhouse({details}) {
             <h3><b>Date:</b> {details.date}</h3>
             <h3><b>Start Time:</b> {details.startTime}</h3>
             <h3><b>End Time:</b> {details.endTime}</h3>
-            <h3><b>Listing Agent:</b> {details.agentFirstName} {details.agentLastName}</h3>
+            <h3><b>Showing Agent:</b> {details.agentFirstName} {details.agentLastName}</h3>
         </div>);
 }
