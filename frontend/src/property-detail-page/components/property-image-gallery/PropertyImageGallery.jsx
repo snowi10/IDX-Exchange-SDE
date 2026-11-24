@@ -6,7 +6,7 @@ import styles from './PropertyImageGallery.module.css';
 
 /**
  * The component to display photos of a property on the detail page.
- * @param {list} photos - The list of URL's of photos for a property. 
+ * @param {array} photos - The list of URLs of photos of a property. 
  */
 export function PropertyImageGallery({ photos }) {
     const maxGalleryPhotos = 7;
@@ -19,12 +19,14 @@ export function PropertyImageGallery({ photos }) {
     let photoStrip = [];
     let startLightboxPhoto;
 
+    // To handle photos that are loading.
     function handleLoadingPhoto(target) {
         setPhotoIsLoading(photoIsLoading.map((value, index) => {
             value = index === target ? false : value;
         }));
     }
 
+    // To handle clicking on a photo in the gallery.
     function handlePhotoClick(e, photoNum) {
         e.preventDefault();
         e.stopPropagation();
@@ -32,36 +34,44 @@ export function PropertyImageGallery({ photos }) {
         setLightboxState(true);
     }
 
+    // To handle exiting the lightbox.
     function handleOnBackgroundClick() {
         setLightboxState(false);
     }
 
+    // To handle clicking to the previous photo.
     function handleOnPrevClick(e) {
         e.preventDefault();
         e.stopPropagation();
 
+        // Only move to the previous photo if applicable.
         if (currLightboxPhoto - 1 >= 0) {
             setCurrLightboxPhoto(currLightboxPhoto - 1);
         }
     }
 
+    // To handle clicking to the next photo.
     function handleOnNextClick(e) {
         e.preventDefault();
         e.stopPropagation();
 
+        // Only move to the next photo if applicable.
         if (currLightboxPhoto + 1 < photos.length) {
             setCurrLightboxPhoto(currLightboxPhoto + 1);
         }
     }
 
+    // To handle clicking on a photo in the lightbox.
     function handleOnLightboxPhotoClick(e, photoNum) {
         e.preventDefault();
         e.stopPropagation();
         setCurrLightboxPhoto(photoNum);
     }
 
+    // The photo that will begin the lightbox strip. 
     startLightboxPhoto = findLastDivisibleNum(currLightboxPhoto, maxLightboxStripPhotos);
 
+    // Show photo unavailable for a property with no photos.
     if (photos.length === 0) {
         return (
             <div id={styles.gallery_body}>
@@ -71,8 +81,10 @@ export function PropertyImageGallery({ photos }) {
             </div>);
     }
 
+    // Replace the main photo if it is still loading.
     mainPhoto = photoIsLoading[mainPhotoNum] ? loading : photos[mainPhotoNum];
 
+    // Only show the main photo for a property with only one photo.
     if (photos.length === 1) {
         return (
             <>
@@ -85,6 +97,7 @@ export function PropertyImageGallery({ photos }) {
             </>);
     }
 
+    // Create the gallery strip of photos.
     for (let i = mainPhotoNum + 1; i < photos.length && i < maxGalleryPhotos; i++) {
         let displayPhoto = photoIsLoading[i] ? loading : photos[i];
         photoStrip.push(<div key={i}><img src={displayPhoto} onClick={(e) => handlePhotoClick(e, i)} onLoad={() => handleLoadingPhoto(i)}></img></div>);
@@ -106,7 +119,14 @@ export function PropertyImageGallery({ photos }) {
         </>)
 }
 
+/**
+ * Find the last divisible number given the dividend and the divisor. 
+ * @param {number} currNum - The number being divided (dividend).
+ * @param {number} divisor - The number that is dividing (divisor).
+ * @return a number that is divisible by the divisor.
+ */
 function findLastDivisibleNum(currNum, divisor) {
+    // Go to the previous number while the current number is not divisible by the divisor.
     while (currNum % divisor !== 0) {
         currNum--;
     }

@@ -80,7 +80,8 @@ function createPageButtons(currentPage, totalProperties, itemsPerPage, onPageCli
     else {
         for (let i = 0; i < numOfPages; i++) {
             const pageNumber = i + 1;
-            const colorStyle = setOnPageColor(currentPageNumber, pageNumber);
+            const colorStyle = currentPageNumber === pageNumber ? {color: 'lightgrey', cursor: 'default'} : {};
+            //const colorStyle = setOnPageColor(currentPageNumber, pageNumber);
             pageButtonsBuilder.push(<p key={pageNumber} style={{display: 'inline'}}><button style={colorStyle} className={styles.page_button} type="button" value={pageNumber} onClick={(e) => onPageClick(e)}>{pageNumber}</button></p>)
         }
     }

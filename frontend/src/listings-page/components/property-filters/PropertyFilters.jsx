@@ -1,19 +1,17 @@
 import styles from './PropertyFilters.module.css';
-import { useState } from 'react';
 
 /**
  * A component to filter the list of properties. 
  * @param {function} onSubmit - To handle the submission of the filters form. 
  * @param {function} onFilterChange - To handle changes within the filters form. 
  * @param {function} onClearFilters - To handle clearing the previous filters. 
+ * @param {function} onSortByChange - To handle the 'Sort By' filter.
  * @param {object} filters - Keys representing the names of the filters and their values. 
+ * @param {boolean} showOrderBy - Specifies if the 'Order' filter should be displayed or not.
  */
 export function PropertyFilters({ onSubmit, onFilterChange, onClearFilters, onSortByChange, filters, showOrderBy }) {
-    let orderByDisplay = {display: 'none'};
-
-    if (showOrderBy) {
-        orderByDisplay = {display: 'block'};
-    }
+    // Show 'Order' filter or not.
+    let orderByDisplay = showOrderBy ? {display: 'block'} : {display: 'none'};
 
     return (
         <div className={styles.filter_container}>

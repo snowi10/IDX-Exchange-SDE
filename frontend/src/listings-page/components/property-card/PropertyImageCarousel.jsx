@@ -11,7 +11,7 @@ import styles from './PropertyCard.module.css';
  * @param {function} onNextPhotoClick - To handle when the button to move to the next photo is clicked on.
  * @returns 
  */
-export function PropertyImageCarousel({photo, currentPhoto, totalPhotos, style, setPhotoIsLoading, onPrevPhotoClick, onNextPhotoClick}) {
+export function PropertyImageCarousel({ photo, currentPhoto, totalPhotos, style, setPhotoIsLoading, onPrevPhotoClick, onNextPhotoClick }) {
 
     // Change button style depending on the total number of photos.
     const button_style = totalPhotos > 1 ? styles.photo_button : styles.photo_button_disabled;

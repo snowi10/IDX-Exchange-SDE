@@ -20,10 +20,12 @@ export default function PropertyDetailPage() {
     const { id } = useParams();
     const thisPath = useLocation();
 
+    // Scroll to top of the page on first navigation.
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [thisPath]);
 
+    // Fetch details of a property.
     useEffect(() => {
         const fetchPropDetail = async () => {
             const detail = await fetchPropertyDetail(id);
@@ -63,13 +65,14 @@ export default function PropertyDetailPage() {
     }, []);
 
 
+    // Fetch openhouse information of a property.
     useEffect(() => {
         const getOpenhouseDetail = async () => {
             const detail = await fetchOpenhouseDetail(id);
             let currOpenhouse = {};
 
             if (detail.lenth === 0) {
-                currOpenhouse = {isInfo: false};
+                currOpenhouse = {isInfo: false}; // No openhouse information exists.
             }
             else {
 

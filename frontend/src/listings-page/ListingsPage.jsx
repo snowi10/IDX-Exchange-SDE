@@ -21,6 +21,7 @@ export default function ListingsPage() {
     const [itemsPerPage, setItemsPerPage] = useState(0);
     const [showOrderBy, setShowOrderBy] = useState(false);
 
+    // Convert filters object to string 
     const filtersString = filtersToString(filters);
 
     // The first number and the last number of the properties in a page. 
@@ -39,6 +40,7 @@ export default function ListingsPage() {
     // TODO: Create function for not letting minPrice be greater than maxPrice and maxPrice be less than minPrice.
     // Handle changing filters in the PropertyFilters component.
     function handleFilterChange(e) {
+        // Only allow filter changes if the page is not currently loading.
         if (!loading) {
             setSubmitted(false);
             setFilters({... filters, [e.target.name]: e.target.value});
@@ -48,11 +50,30 @@ export default function ListingsPage() {
 
     // Handle clearing filters in the PropertyFilters component.
     function handleClearFilters() {
+        // Only allow clearing filters if the page is not currently loading.
         if (!loading) {
             setSubmitted(true);
             setFilters({});
             setShowOrderBy(false);
             setCurrentPage(0);
+        }
+    }
+
+    // Handle showing the "Order" filter when the "Sort by" filter changes.
+    function handleOnSortByChange(e) {
+        // Only allow filter changes if the page is not currently loading.
+        if (loading) {
+            return;
+        }
+
+        if (e.target.value === '') {
+            delete filters?.orderBy;
+            handleFilterChange(e);
+            setShowOrderBy(false);
+        }
+        else {
+            handleFilterChange(e);
+            setShowOrderBy(true);
         }
     }
 
@@ -65,20 +86,6 @@ export default function ListingsPage() {
             setSubmitted(true);
             setCurrentPage(prevPage);
             setFilters({... filters, offset: (prevPage * itemsPerPage)})
-        }
-    }
-
-    function handleOnSortByChange(e) {
-        if (!loading) {
-            if (e.target.value === '') {
-                delete filters?.orderBy;
-                handleFilterChange(e);
-                setShowOrderBy(false);
-            }
-            else {
-                handleFilterChange(e);
-                setShowOrderBy(true);
-            }
         }
     }
 

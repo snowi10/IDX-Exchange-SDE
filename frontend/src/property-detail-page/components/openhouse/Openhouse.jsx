@@ -1,4 +1,9 @@
-export function Openhouse({details}) {
+/**
+ * The component to display openhouse information of a property. 
+ * @param {object} details - Keys representing openhouse details and their values.
+ */
+export function Openhouse({ details }) {
+    // Return no openhouse information if it does not exist.
     if (!details.isInfo) {
         return (
             <div>

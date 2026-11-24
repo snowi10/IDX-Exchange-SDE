@@ -8,55 +8,68 @@ import styles from './PropertyCard.module.css';
 
 /**
  * The component to display individual properties on a card. 
- * @param {string} photo - The first photo URL of the property.
+ * @param {number} id - The ID of the property
+ * @param {string} photos - The list of URLs of photos of the property.
  * @param {number} price - The listing price of the property.
  * @param {string} address - The address line of the property.
  * @param {string} zip - The zip code of the property.
  * @param {string} city - The city of the property.
  * @param {string} state - The state of the property.
  * @param {number} beds - The number of beds that the property has.
- * @param {number} beds - The number of baths that the property has.
+ * @param {number} baths - The number of baths that the property has.
+ * @param {number} sqft - The square feet of the property.
  */
 export function PropertyCard({ id, photos, price, address, zip, city, state, beds, baths, sqft }) {
     const [photoIsLoading, setPhotoIsLoading] = useState(true);
     const [currentPhoto, setCurrentPhoto] = useState(0);
 
+    // Use address, city, state, and zip to create a full, readable address to display on the card.
     const fullAddress = createFullAddress(address, city, state, zip);
 
+    // To handle clicking to the previous photo.
     function handlePrevPhotoClick(e) {
         e.preventDefault();
         e.stopPropagation();
 
+        // Do nothing for no photos to move to.
         if (photos === 'Photo Unavailable') {
             return;
         }
         if (photos.length <= 1) {
             return;
         }
+
+        // Move to the previous photo.
         if (currentPhoto > 0) {
             setCurrentPhoto(currentPhoto - 1);
             setPhotoIsLoading(true);
         }
+        // Move to the last photo when at the beginning photo.
         else {
             setCurrentPhoto(photos.length - 1);
             setPhotoIsLoading(true);
         }
     }
 
+    // To handle clicking to the next photo.
     function handleNextPhotoClick(e) {
         e.preventDefault();
         e.stopPropagation();
 
+        // Do nothing for no photos to move to.
         if (photos === 'Photo Unavailable') {
             return;
         }
         if (photos.length <= 1) {
             return;
         }
+
+        // Move to the next photo.
         if (currentPhoto < photos.length - 1) {
             setCurrentPhoto(currentPhoto + 1);
             setPhotoIsLoading(true);
         }
+        // Move to beginning photo when at the last photo.
         else {
             setCurrentPhoto(0);
             setPhotoIsLoading(true);
