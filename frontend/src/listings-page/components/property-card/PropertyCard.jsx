@@ -83,7 +83,6 @@ export function PropertyCard({ id, photos, price, address, zip, city, state, bed
     const actual = photoIsLoading ? {display: "none"} : {display : "block"};
     const placeholder = photoIsLoading ? {display: "block"} : {display: "none"};
 
-    // TODO: Add commas to prices.
     return (
         <NavLink to={`/property/${id}`}>
         <div className={styles.property_card}>
@@ -91,7 +90,7 @@ export function PropertyCard({ id, photos, price, address, zip, city, state, bed
             <PropertyImageCarousel style={placeholder} photo={loading_photo} currentPhoto={photos === 'Photo Unavailable' ? 0 : currentPhoto + 1} totalPhotos={photos === 'Photo Unavailable' ? 0 : photos.length} onPrevPhotoClick={handlePrevPhotoClick} onNextPhotoClick={handleNextPhotoClick} />
             <div className={styles.description_container}>
                 <p id={styles.price}>${price}</p>
-                <p><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Sqft</b>: {sqft}</p>
+                <p id={styles.main_features}><b>Beds</b>: {beds} | <b>Baths</b>: {baths} | <b>Sqft</b>: {sqft}</p>
                 <p id={styles.address}>{fullAddress}</p>
             </div>
         </div>

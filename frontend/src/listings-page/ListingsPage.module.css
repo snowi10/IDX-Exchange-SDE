@@ -26,6 +26,6 @@ a {
 .property_grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, min(300px));
-    grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
+    /*grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));*/
     justify-content: center;
 }
