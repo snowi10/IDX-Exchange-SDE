@@ -1,5 +1,5 @@
 import { useParams, useLocation } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fetchPropertyDetail, fetchOpenhouseDetail } from '../api/client';
 import { createFullAddress } from '../common/createFullAddress.js';
@@ -10,16 +10,43 @@ import { errorBoundaryMessage } from '../common/errorBoundaryMessage.jsx';
 import styles from './PropertyDetailPage.module.css';
 
 // TODO: Add more descriptions to the page.
-// TODO: Parse time of openhouse information.
-// TODO: Have 'show more' button for long sections.
-// TODO: Fix empty strings for openhouse information.
 export default function PropertyDetailPage() {
-    const [propDetail, setPropDetail] = useState({})
+    const [propDetails, setPropDetails] = useState({})
     const [photoGallery, setPhotoGallery] = useState([]);
     const [openhouseDetails, setOpenhouseDetails] = useState([]);
+    const [descriptionIsOverflowing, setDescriptionIsOverflowing] = useState(false);
+    const [descriptionShowMore, setDescriptionShowMore] = useState(false);
     const { id } = useParams();
     const thisPath = useLocation();
+    const descriptionText = useRef(null);
 
+    let descriptionShowText = '';
+    let descriptionDisplay = {};
+    let descriptionEllipsisDisplay = {};
+    let descriptionShowMoreDisplay = {};
+
+    console.log(descriptionIsOverflowing);
+    // Add 'Show more' button for long property description.
+    if (descriptionIsOverflowing) {
+        descriptionShowText = descriptionShowMore ? 'Show less' : 'Show more';
+        descriptionDisplay = descriptionShowMore ? {maxHeight: '100%'} : {};
+        descriptionEllipsisDisplay = descriptionShowMore ? {display: 'none'} : {display: 'block'};
+    }
+    else {
+        descriptionEllipsisDisplay = {display: 'none'};
+        descriptionShowMoreDisplay = {display: 'none'};
+    }
+
+    // To handle showing more of the description of a property.
+    function handleOnShowClick() {
+        if (descriptionShowMore) {
+            setDescriptionShowMore(false);
+        }
+        else {
+            setDescriptionShowMore(true);
+        }
+    }
+    
     // Scroll to top of the page on first navigation.
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -30,7 +57,7 @@ export default function PropertyDetailPage() {
         const fetchPropDetail = async () => {
             const detail = await fetchPropertyDetail(id);
             const photos = detail.L_Photos ? JSON.parse(detail.L_Photos) : 'Photo Unavailable';
-            const price = detail.L_SystemPrice ? parseInt(detail.L_SystemPrice) : 'N/A';
+            const price = detail.L_SystemPrice ? parseInt(detail.L_SystemPrice).toLocaleString('en-us') : 'N/A';
             const address = detail.L_Address;
             const city = detail.L_City;
             const zip = detail.L_Zip;
@@ -45,7 +72,7 @@ export default function PropertyDetailPage() {
 
             const fullAddress = createFullAddress(address, city, state, zip);
 
-            setPropDetail({
+            setPropDetails({
                 price: price, 
                 address: fullAddress, 
                 beds: beds, 
@@ -79,11 +106,12 @@ export default function PropertyDetailPage() {
                 for (let i = 0; i < detail.length; i++) {
                     const status = detail[i].OpenHouseStatus;
                     const type = detail[i].OpenHouseType;
-                    const startTime = detail[i].OpenHouseStartTime;
-                    const endTime = detail[i].OpenHouseEndTime;
-                    const date = detail[i].OpenHouseDate;
-                    const agentFirstName = detail[i].ShowingAgentFirstName;
-                    const agentLastName = detail[i].ShowingAgentLastName;
+                    const startTime = detail[i].OpenHouseStartTime ? new Date(detail[i].OpenHouseStartTime).toLocaleTimeString('en-US', {timeStyle: 'short'}) : 'N/A';
+                    const endTime = detail[i].OpenHouseEndTime ? new Date(detail[i].OpenHouseEndTime).toLocaleTimeString('en-US', {timeStyle: 'short'}) : 'N/A';
+                    const date = detail[i].OpenHouseDate ? new Date(detail[i].OpenHouseDate).toLocaleDateString('en-US') : 'N/A'; 
+                    const agentFirstName = detail[i].ShowingAgentFirstName ? detail[i].ShowingAgentFirstName : 'N/A';
+                    const agentLastName = detail[i].ShowingAgentLastName ? detail[i].ShowingAgentLastName : 'N/A';
+
                     currOpenhouse = {
                         isInfo: true,
                         status: status, 
@@ -103,22 +131,33 @@ export default function PropertyDetailPage() {
         getOpenhouseDetail();
     }, []);
 
+    // TODO: Rerun effect when browser is resized.
+    // Determine if description of propety is long.
+    useLayoutEffect(() => {
+        if ((descriptionText.current).clientHeight < (descriptionText.current).scrollHeight) {
+            setDescriptionIsOverflowing(true);
+        }
+    }, [propDetails]);
+
     return (
     <ErrorBoundary fallback={errorBoundaryMessage()}>
         <PropertyImageGallery photos={photoGallery} />
         <div id={styles.detail_body}>
             <div>
-                <h1 id={styles.main}><b>${propDetail.price}</b> | <b>Beds:</b> {propDetail.beds} | <b>Baths:</b> {propDetail.baths} | <b>Sqft:</b> {propDetail.sqft}<br></br></h1>
-                <h2 id={styles.address}>{propDetail.address}</h2>
+                <h1 id={styles.main}><b>${propDetails.price}</b> | <b>Beds:</b> {propDetails.beds} | <b>Baths:</b> {propDetails.baths} | <b>Sqft:</b> {propDetails.sqft}<br></br></h1>
+                <h2 id={styles.address}>{propDetails.address}</h2>
                 <h3><b>Features:</b></h3>
-                <p>Year built: {propDetail.year}</p>
+                <p>Year built: {propDetails.year}</p>
                 <h3><b>Description:</b><br></br></h3>
-                <p>{propDetail.description}</p>
+                <div id={styles.description} style={descriptionDisplay} ref={descriptionText}>
+                    <p id={styles.description_text}>{propDetails.description}</p>
+                </div><p style={descriptionEllipsisDisplay}>...</p>
+                <button className={styles.show_more} type='button' style={descriptionShowMoreDisplay} onClick={() => handleOnShowClick()}>{descriptionShowText}</button>
             </div>
             <hr></hr>
             {openhouseDetails}
             <hr></hr>
-            <PropertyMap latitude={propDetail.latitude} longitude={propDetail.longitude} />
+            <PropertyMap latitude={propDetails.latitude} longitude={propDetails.longitude} />
         </div>
     </ErrorBoundary>);
 }

@@ -27,3 +27,30 @@ hr {
     font-weight: normal;
     font-size: 35px;
 }
+
+#description {
+    overflow: hidden;
+    max-height: 100px;
+}
+
+#description_text {
+    margin-bottom: 0;
+}
+
+.show_more {
+    margin-top: 20px;
+    display: block;
+    height: 30%;
+    color: black;
+    background-color: lightgray;
+    border: 1px solid  black ;
+    border-radius: 15px;
+    font-family: 'CharisSil';
+    font-size: 01em;
+    overflow: hidden; 
+}
+
+.show_more:hover {
+    background-color: grey;
+    cursor: pointer; 
+}
