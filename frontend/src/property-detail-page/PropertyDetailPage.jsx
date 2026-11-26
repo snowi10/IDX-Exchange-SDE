@@ -24,17 +24,19 @@ export default function PropertyDetailPage() {
     let descriptionDisplay = {};
     let descriptionEllipsisDisplay = {};
     let descriptionShowMoreDisplay = {};
+    let breakDisplay = {};
 
-    console.log(descriptionIsOverflowing);
     // Add 'Show more' button for long property description.
     if (descriptionIsOverflowing) {
         descriptionShowText = descriptionShowMore ? 'Show less' : 'Show more';
+        breakDisplay = !descriptionShowMore ? {display: 'none'} : {};
         descriptionDisplay = descriptionShowMore ? {maxHeight: '100%'} : {};
         descriptionEllipsisDisplay = descriptionShowMore ? {display: 'none'} : {display: 'block'};
     }
     else {
         descriptionEllipsisDisplay = {display: 'none'};
         descriptionShowMoreDisplay = {display: 'none'};
+        breakDisplay = {display: 'none'};
     }
 
     // To handle showing more of the description of a property.
@@ -133,10 +135,20 @@ export default function PropertyDetailPage() {
 
     // TODO: Rerun effect when browser is resized.
     // Determine if description of propety is long.
-    useLayoutEffect(() => {
-        if ((descriptionText.current).clientHeight < (descriptionText.current).scrollHeight) {
-            setDescriptionIsOverflowing(true);
+    useEffect(() => {
+        function checkIsOverflowing() {
+            if ((descriptionText.current).clientHeight < (descriptionText.current).scrollHeight) {
+                setDescriptionIsOverflowing(true);
+            }
+            else {
+                setDescriptionIsOverflowing(false);
+            }
         }
+
+        window.addEventListener('resize', checkIsOverflowing);
+        checkIsOverflowing();
+        return () => window.removeEventListener('resize', checkIsOverflowing);
+
     }, [propDetails]);
 
     return (
@@ -150,11 +162,12 @@ export default function PropertyDetailPage() {
                 <p>Year built: {propDetails.year}</p>
                 <h3><b>Description:</b><br></br></h3>
                 <div id={styles.description} style={descriptionDisplay} ref={descriptionText}>
-                    <p id={styles.description_text}>{propDetails.description}</p>
-                </div><p style={descriptionEllipsisDisplay}>...</p>
+                    <p className={styles.subsection_body}>{propDetails.description}</p>
+                </div>
+                <p style={descriptionEllipsisDisplay}>...</p>
+                <br style={breakDisplay}></br>
                 <button className={styles.show_more} type='button' style={descriptionShowMoreDisplay} onClick={() => handleOnShowClick()}>{descriptionShowText}</button>
             </div>
-            <hr></hr>
             {openhouseDetails}
             <hr></hr>
             <PropertyMap latitude={propDetails.latitude} longitude={propDetails.longitude} />
