@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from '../../PropertyDetailPage.module.css';
 
-// TODO: Create 'Show more' button for openhouse details.
 /**
  * The component to display openhouse information of a property. 
  * @param {object} details - Keys representing openhouse details and their values.
