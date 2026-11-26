@@ -133,8 +133,7 @@ export default function PropertyDetailPage() {
         getOpenhouseDetail();
     }, []);
 
-    // TODO: Rerun effect when browser is resized.
-    // Determine if description of propety is long.
+    // Determine if description of property is long.
     useEffect(() => {
         function checkIsOverflowing() {
             if ((descriptionText.current).clientHeight < (descriptionText.current).scrollHeight) {
@@ -145,6 +144,7 @@ export default function PropertyDetailPage() {
             }
         }
 
+        // Adjust 'Show more' button when resizing window.
         window.addEventListener('resize', checkIsOverflowing);
         checkIsOverflowing();
         return () => window.removeEventListener('resize', checkIsOverflowing);
@@ -156,7 +156,8 @@ export default function PropertyDetailPage() {
         <PropertyImageGallery photos={photoGallery} />
         <div id={styles.detail_body}>
             <div>
-                <h1 id={styles.main}><b>${propDetails.price}</b> | <b>Beds:</b> {propDetails.beds} | <b>Baths:</b> {propDetails.baths} | <b>Sqft:</b> {propDetails.sqft}<br></br></h1>
+                <h1 className={styles.main}><b>${propDetails.price}</b></h1>
+                <h1 className={styles.main} id={styles.sub}><b>Beds:</b> {propDetails.beds} | <b>Baths:</b> {propDetails.baths} | <b>Sqft:</b> {propDetails.sqft}<br></br></h1>
                 <h2 id={styles.address}>{propDetails.address}</h2>
                 <h3><b>Features:</b></h3>
                 <p>Year built: {propDetails.year}</p>

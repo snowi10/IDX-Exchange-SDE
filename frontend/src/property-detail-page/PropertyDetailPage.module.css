@@ -18,17 +18,21 @@ hr {
     margin: 15px;
 }
 
-#main {
+.main {
     margin-top: 0;
     margin-bottom: 0;
     font-weight: normal;
     font-size: 40px;
 }
 
+#sub {
+    font-size: clamp(25px, 4vw, 35px);
+}
+
 #address {
     margin-top: 0;
     font-weight: normal;
-    font-size: 35px;
+    font-size: clamp(25px, 4vw, 35px);
 }
 
 #description {
