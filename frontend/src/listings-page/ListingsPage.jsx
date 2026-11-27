@@ -230,7 +230,7 @@ function createPropertyCards(propertyData) {
         const result = propertyData.results[i];
         const id = result.L_ListingID;
         const photos = result.L_Photos ? JSON.parse(result.L_Photos) : 'Photo Unavailable';
-        const price = result.L_SystemPrice ? parseInt(result.L_SystemPrice) : 'N/A';
+        const price = result.L_SystemPrice ? parseInt(result.L_SystemPrice).toLocaleString('en-US') : 'N/A';
         const address = result.L_Address;
         const city = result.L_City;
         const zip = result.L_Zip;

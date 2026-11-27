@@ -1,3 +1,5 @@
+/* TODO: Move tag stylings to main page */
+
 h1, h2, h3 {
     margin-bottom: 0;
     font-weight: normal;
@@ -11,19 +13,54 @@ p {
 hr {
     border-top: solid 0.5px;
 }
+
 #detail_body {
     margin: 15px;
 }
 
-#main {
+.main {
     margin-top: 0;
     margin-bottom: 0;
     font-weight: normal;
     font-size: 40px;
 }
 
+#sub {
+    font-size: clamp(25px, 4vw, 35px);
+}
+
 #address {
     margin-top: 0;
     font-weight: normal;
-    font-size: 35px;
+    font-size: clamp(25px, 4vw, 35px);
+}
+
+#description {
+    overflow: hidden;
+    max-height: 100px;
+}
+
+.description_body {
+    margin-bottom: 0;
+}
+
+.show_more {
+    height: 30%;
+    color: black;
+    background-color: lightgray;
+    border: 1px solid  black ;
+    border-radius: 15px;
+    font-family: 'CharisSil';
+    font-size: 01em;
+    overflow: hidden; 
+}
+
+.show_more:hover {
+    background-color: grey;
+    cursor: pointer; 
+}
+
+#openhouse_detail {
+    max-height: 200px;
+    overflow: hidden;
 }

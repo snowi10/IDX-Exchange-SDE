@@ -19,14 +19,14 @@ export function PropertyImageGallery({ photos }) {
     let photoStrip = [];
     let startLightboxPhoto;
 
-    // To handle photos that are loading.
+    // Handle photos that are loading.
     function handleLoadingPhoto(target) {
         setPhotoIsLoading(photoIsLoading.map((value, index) => {
             value = index === target ? false : value;
         }));
     }
 
-    // To handle clicking on a photo in the gallery.
+    // Handle clicking on a photo in the gallery.
     function handlePhotoClick(e, photoNum) {
         e.preventDefault();
         e.stopPropagation();
@@ -34,12 +34,12 @@ export function PropertyImageGallery({ photos }) {
         setLightboxState(true);
     }
 
-    // To handle exiting the lightbox.
+    // Handle exiting the lightbox.
     function handleOnBackgroundClick() {
         setLightboxState(false);
     }
 
-    // To handle clicking to the previous photo.
+    // Handle clicking to the previous photo.
     function handleOnPrevClick(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -50,7 +50,7 @@ export function PropertyImageGallery({ photos }) {
         }
     }
 
-    // To handle clicking to the next photo.
+    // Handle clicking to the next photo.
     function handleOnNextClick(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -61,7 +61,7 @@ export function PropertyImageGallery({ photos }) {
         }
     }
 
-    // To handle clicking on a photo in the lightbox.
+    // Handle clicking on a photo in the lightbox.
     function handleOnLightboxPhotoClick(e, photoNum) {
         e.preventDefault();
         e.stopPropagation();
