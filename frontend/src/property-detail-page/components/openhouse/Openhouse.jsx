@@ -14,6 +14,7 @@ export function Openhouse({ details }) {
     let openhouseEllipsis = openhouseShowMore ? {display: 'none'} : {};
     let openhouseDetailStyle = openhouseShowMore ? {maxHeight: '100%'} : {maxHeight: '120px'};
     
+    // Handle clicking on the 'Show more' button.
     function handleOnShowClick() {
         if (openhouseShowMore) {
             setOpenhouseShowMore(false);
@@ -28,6 +29,7 @@ export function Openhouse({ details }) {
         return;
     }
 
+    // Adjust 'Show more' button according to window size.
     useEffect(() => {
         if (openhouseText.current.clientHeight < openhouseText.current.scrollHeight) {
             console.log(true);
