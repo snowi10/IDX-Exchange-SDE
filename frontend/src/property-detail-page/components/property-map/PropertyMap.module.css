@@ -2,5 +2,8 @@ iframe {
     display: block;
     margin: 0 auto;
     margin-top: 40px;
+    width: 80%;
+    height: 50vw;
     border: grey solid 3px;
+    object-fit: contain;
 }

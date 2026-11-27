@@ -6,9 +6,8 @@ import styles from './PropertyMap.module.css';
  * @param {number} longitude - The longitude of the property.
  */ 
 export function PropertyMap({ latitude, longitude }) {
-    // TODO: Make frame more dynamic.
     return (
     <div> 
-        <iframe width="80%" height="700px" src={`https://www.google.com/maps/embed/v1/place?key=${process.env.VITE_GOOGLE_MAPS_API_KEY}&q=${latitude},${longitude}`}></iframe>
+        <iframe src={`https://www.google.com/maps/embed/v1/place?key=${process.env.VITE_GOOGLE_MAPS_API_KEY}&q=${latitude},${longitude}`}></iframe>
     </div>);
 }
