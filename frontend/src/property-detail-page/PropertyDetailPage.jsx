@@ -163,7 +163,7 @@ export default function PropertyDetailPage() {
                 <p>Year built: {propDetails.year}</p>
                 <h3><b>Description:</b><br></br></h3>
                 <div id={styles.description} style={descriptionDisplay} ref={descriptionText}>
-                    <p className={styles.subsection_body}>{propDetails.description}</p>
+                    <p className={styles.description_body}>{propDetails.description}</p>
                 </div>
                 <p style={descriptionEllipsisDisplay}>...</p>
                 <br style={breakDisplay}></br>
